@@ -46,8 +46,8 @@ const SCENARIOS = [
   },
 ]
 
-const W = 300
-const H = 280
+const W = 500
+const H = 400
 
 export default function RateOfChangeModule() {
   const [scenarioIdx, setScenarioIdx] = useState(0)

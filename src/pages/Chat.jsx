@@ -115,7 +115,7 @@ export default function Chat() {
       )}
 
       {/* Input */}
-      <div className="px-4 pb-4 pt-2">
+      <div className="px-4 pb-24 md:pb-4 pt-2">
         <div className="glass flex items-end gap-3 p-3 rounded-2xl border border-white/10">
           <textarea
             ref={inputRef}

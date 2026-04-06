@@ -11,7 +11,7 @@ import Formulas from './pages/Formulas.jsx'
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#0d0d1a] pb-20 md:pb-0">
+      <div className="min-h-screen bg-[#0d0d1a] pb-24 md:pb-0">
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<Landing />} />
@@ -20,6 +20,7 @@ export default function App() {
             <Route path="/ar" element={<ARPage />} />
             <Route path="/visualize/:topic" element={<VisualizePage />} />
             <Route path="/formulas" element={<Formulas />} />
+            <Route path="*" element={<Landing />} />
           </Routes>
         </AnimatePresence>
         <TabBar />
