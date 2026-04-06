@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const API_URL = import.meta.env.VITE_API_URL || 'https://calculens-ar.onrender.com'
 
 const CHAT_SYSTEM = `You are CalcuLens AI, a friendly and encouraging calculus tutor.
 You help students with all calculus topics including limits, derivatives, integration, solids of revolution, optimization, and related rates.
