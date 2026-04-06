@@ -17,12 +17,14 @@ const PRESETS = [
 function Solid({ fn, bounds, sweepAngle, color, wireframe }) {
   const groupRef = useRef()
   const [a, b] = bounds
+  const showSolid = sweepAngle > 0.15
 
   useFrame((_, dt) => {
     if (groupRef.current) groupRef.current.rotation.x += dt * 0.05
   })
 
   const geo = useMemo(() => {
+    if (!showSolid) return null
     const pts = []
     const N = 150
     for (let i = 0; i <= N; i++) {
@@ -32,15 +34,15 @@ function Solid({ fn, bounds, sweepAngle, color, wireframe }) {
       pts.push(new THREE.Vector2(y, x))
     }
     const g = new THREE.LatheGeometry(pts, 96, 0, sweepAngle)
-    // Center it
     g.computeBoundingBox()
     const c = new THREE.Vector3()
     g.boundingBox.getCenter(c)
     g.translate(-c.x, -c.y, -c.z)
-    // Rotate so axis of revolution is horizontal
     g.rotateZ(Math.PI / 2)
     return g
-  }, [fn, a, b, sweepAngle])
+  }, [fn, a, b, sweepAngle, showSolid])
+
+  if (!showSolid || !geo) return null
 
   return (
     <group ref={groupRef} rotation={[0.3, 0, 0]}>
@@ -76,25 +78,22 @@ function Solid({ fn, bounds, sweepAngle, color, wireframe }) {
 
 function CurveOutline({ fn, bounds, color }) {
   const [a, b] = bounds
-  const pts = useMemo(() => {
-    const arr = []
-    for (let i = 0; i <= 80; i++) {
-      const x = a + (b - a) * (i / 80)
+
+  const tubeGeo = useMemo(() => {
+    const curvePts = []
+    for (let i = 0; i <= 100; i++) {
+      const x = a + (b - a) * (i / 100)
       const y = fn(x)
-      arr.push(new THREE.Vector3(x - (a + b) / 2, y, 0))
+      curvePts.push(new THREE.Vector3(x - (a + b) / 2, y, 0))
     }
-    return arr
+    const curve = new THREE.CatmullRomCurve3(curvePts)
+    return new THREE.TubeGeometry(curve, 100, 0.04, 8, false)
   }, [fn, a, b])
 
-  const geo = useMemo(() => {
-    const g = new THREE.BufferGeometry().setFromPoints(pts)
-    return g
-  }, [pts])
-
   return (
-    <line geometry={geo}>
-      <lineBasicMaterial color="#f59e0b" transparent opacity={0.6} />
-    </line>
+    <mesh geometry={tubeGeo}>
+      <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={0.6} />
+    </mesh>
   )
 }
 
