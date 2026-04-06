@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { OrbitControls, Text } from '@react-three/drei'
+import * as THREE from 'three'
 import { BlockMathDisplay } from '../Shared/MathDisplay.jsx'
 
 const AR_MODELS = {
@@ -9,6 +12,10 @@ const AR_MODELS = {
     description: 'y = x² rotated about the x-axis, bounds [0, 2]',
     formula: 'V = \\pi\\int_0^2 (x^2)^2\\,dx = \\frac{32\\pi}{5}',
     icon: '🔵',
+    isRevolution: true,
+    fn: (x) => x * x,
+    bounds: [0, 2],
+    color: '#667eea',
     realWorld: {
       problem: 'A satellite dish is shaped like a paraboloid formed by rotating y = x² about the x-axis from x = 0 to x = 2 meters. Calculate the volume of material needed to manufacture the dish.',
       context: '🛰️ Satellite Dish Manufacturing',
@@ -26,6 +33,10 @@ const AR_MODELS = {
     description: 'y = x rotated about the x-axis, bounds [0, 3]',
     formula: 'V = \\pi\\int_0^3 x^2\\,dx = 9\\pi',
     icon: '🔺',
+    isRevolution: true,
+    fn: (x) => x,
+    bounds: [0, 3],
+    color: '#a78bfa',
     realWorld: {
       problem: 'A conical water tank has a height of 3 meters and a radius equal to its height. If the tank is completely full, what is the total volume of water it holds?',
       context: '🏗️ Water Tank Design',
@@ -42,6 +53,10 @@ const AR_MODELS = {
     description: 'y = sqrt(r² - x²) rotated about the x-axis',
     formula: 'V = \\frac{4}{3}\\pi r^3',
     icon: '🌐',
+    isRevolution: true,
+    fn: (x) => Math.sqrt(Math.max(0, 4 - x * x)),
+    bounds: [-2, 2],
+    color: '#34d399',
     realWorld: {
       problem: 'A spherical water balloon has a radius of 2 cm. Water is leaking at a rate of 3 cm³/s. How fast is the radius decreasing when r = 2 cm?',
       context: '💧 Leaking Sphere — Related Rates',
@@ -59,6 +74,10 @@ const AR_MODELS = {
     description: 'y = sqrt(x) rotated about the x-axis, bounds [0, 4]',
     formula: 'V = \\pi\\int_0^4 x\\,dx = 8\\pi',
     icon: '🥣',
+    isRevolution: true,
+    fn: (x) => Math.sqrt(Math.max(0, x)),
+    bounds: [0, 4],
+    color: '#34d399',
     realWorld: {
       problem: 'A bowl is designed by rotating the curve y = sqrt(x) about the x-axis from x = 0 to x = 4 inches. What volume of soup can this bowl hold?',
       context: '🍜 Bowl Design — Product Engineering',
@@ -75,6 +94,10 @@ const AR_MODELS = {
     description: 'y = sin(x) rotated about the x-axis, bounds [0, pi]',
     formula: 'V = \\pi\\int_0^{\\pi} \\sin^2(x)\\,dx = \\frac{\\pi^2}{2}',
     icon: '〰️',
+    isRevolution: true,
+    fn: (x) => Math.sin(x),
+    bounds: [0, Math.PI],
+    color: '#f59e0b',
     realWorld: {
       problem: 'A decorative vase is shaped by rotating y = sin(x) about the x-axis from x = 0 to x = pi. Find the volume of water the vase can hold.',
       context: '🏺 Vase Design — Architecture',
@@ -92,6 +115,10 @@ const AR_MODELS = {
     description: 'y = 1/x rotated about the x-axis, bounds [1, 3]',
     formula: 'V = \\pi\\int_1^3 \\frac{1}{x^2}\\,dx = \\frac{2\\pi}{3}',
     icon: '📯',
+    isRevolution: true,
+    fn: (x) => 1 / x,
+    bounds: [1, 3],
+    color: '#f87171',
     realWorld: {
       problem: "Gabriel's Horn paradox: The trumpet shape formed by rotating y = 1/x has FINITE volume but INFINITE surface area. Calculate the volume from x = 1 to x = 3.",
       context: "🎺 Gabriel's Horn — Mathematical Paradox",
@@ -201,41 +228,241 @@ const AR_MODELS = {
   },
 }
 
+// ─── 3D Components for Revolution Animation ───
+
+function RevolutionSolid({ fn, bounds, sweepAngle, color }) {
+  const groupRef = useRef()
+  const [a, b] = bounds
+
+  useFrame((_, dt) => {
+    if (groupRef.current) groupRef.current.rotation.x += dt * 0.05
+  })
+
+  const geo = useMemo(() => {
+    const pts = []
+    const N = 150
+    for (let i = 0; i <= N; i++) {
+      const t = i / N
+      const x = a + (b - a) * t
+      const y = Math.max(0.0001, fn(x))
+      pts.push(new THREE.Vector2(y, x))
+    }
+    const g = new THREE.LatheGeometry(pts, 96, 0, sweepAngle)
+    g.computeBoundingBox()
+    const c = new THREE.Vector3()
+    g.boundingBox.getCenter(c)
+    g.translate(-c.x, -c.y, -c.z)
+    g.rotateZ(Math.PI / 2)
+    return g
+  }, [fn, a, b, sweepAngle])
+
+  return (
+    <group ref={groupRef} rotation={[0.3, 0, 0]}>
+      <mesh geometry={geo}>
+        <meshPhysicalMaterial
+          color={color}
+          transparent
+          opacity={0.8}
+          side={THREE.DoubleSide}
+          metalness={0.15}
+          roughness={0.1}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
+          emissive={color}
+          emissiveIntensity={0.05}
+        />
+      </mesh>
+      <mesh geometry={geo}>
+        <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
+      </mesh>
+    </group>
+  )
+}
+
+function CurveOutline({ fn, bounds }) {
+  const [a, b] = bounds
+  const pts = useMemo(() => {
+    const arr = []
+    for (let i = 0; i <= 80; i++) {
+      const x = a + (b - a) * (i / 80)
+      const y = fn(x)
+      arr.push(new THREE.Vector3(x - (a + b) / 2, y, 0))
+    }
+    return arr
+  }, [fn, a, b])
+
+  const geo = useMemo(() => new THREE.BufferGeometry().setFromPoints(pts), [pts])
+
+  return (
+    <line geometry={geo}>
+      <lineBasicMaterial color="#f59e0b" transparent opacity={0.8} linewidth={2} />
+    </line>
+  )
+}
+
+function Axes3D({ size = 3 }) {
+  const axisData = [
+    { dir: [1, 0, 0], label: 'X' },
+    { dir: [0, 1, 0], label: 'Y' },
+    { dir: [0, 0, 1], label: 'Z' },
+  ]
+  return (
+    <group>
+      {axisData.map(({ dir, label }) => {
+        const end = dir.map((d) => d * size)
+        const negEnd = dir.map((d) => d * -size * 0.3)
+        const path = new THREE.LineCurve3(new THREE.Vector3(...negEnd), new THREE.Vector3(...end))
+        return (
+          <group key={label}>
+            <mesh>
+              <tubeGeometry args={[path, 1, 0.025, 8, false]} />
+              <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} transparent opacity={0.9} />
+            </mesh>
+            <mesh position={end} rotation={dir[0] === 1 ? [0, 0, -Math.PI / 2] : dir[2] === 1 ? [Math.PI / 2, 0, 0] : [0, 0, 0]}>
+              <coneGeometry args={[0.06, 0.2, 8]} />
+              <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+            </mesh>
+            <Text position={end.map((e) => e * 1.12)} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" font={undefined} fontWeight="bold">
+              {label}
+            </Text>
+          </group>
+        )
+      })}
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[0.04, 12, 12]} />
+        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={1} />
+      </mesh>
+    </group>
+  )
+}
+
+function AutoFitAR({ bounds, fn }) {
+  const { camera } = useThree()
+  const [a, b] = bounds
+  const fitted = useRef(false)
+
+  if (!fitted.current) {
+    let maxR = 0
+    for (let i = 0; i <= 50; i++) {
+      const x = a + (b - a) * (i / 50)
+      const y = fn(x)
+      const r = Math.sqrt(x * x + y * y)
+      if (r > maxR) maxR = r
+    }
+    const dist = Math.max(maxR * 2.2, 3)
+    camera.position.set(dist * 0.8, dist * 0.5, dist * 0.8)
+    camera.lookAt(0, 0, 0)
+    camera.updateProjectionMatrix()
+    fitted.current = true
+  }
+
+  return null
+}
+
+function RevolutionScene({ model, sweepAngle }) {
+  return (
+    <>
+      <color attach="background" args={['#080812']} />
+      <fog attach="fog" args={['#080812', 8, 25]} />
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[5, 8, 5]} intensity={1.5} color="#ffffff" />
+      <directionalLight position={[-5, 3, -5]} intensity={0.5} color="#667eea" />
+      <pointLight position={[0, -3, 0]} intensity={0.3} color="#764ba2" />
+
+      <Axes3D size={3} />
+      <CurveOutline fn={model.fn} bounds={model.bounds} />
+      <RevolutionSolid fn={model.fn} bounds={model.bounds} sweepAngle={sweepAngle} color={model.color} />
+      <AutoFitAR bounds={model.bounds} fn={model.fn} />
+
+      <OrbitControls enablePan={false} minDistance={2} maxDistance={15} target={[0, 0, 0]} />
+    </>
+  )
+}
+
+// ─── Main ARViewer Component ───
+
 export default function ARViewer({ selectedTopic }) {
   const model = AR_MODELS[selectedTopic]
   const [scale, setScale] = useState(0.15)
   const [showProblem, setShowProblem] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
+  const [sweepAngle, setSweepAngle] = useState(0.01)
+  const [animating, setAnimating] = useState(false)
+  const [canvasKey, setCanvasKey] = useState(0)
+
+  const handleAnimate = useCallback(() => {
+    setSweepAngle(0.01)
+    setAnimating(true)
+    let start = null
+    const duration = 4000
+    const anim = (ts) => {
+      if (!start) start = ts
+      const p = Math.min((ts - start) / duration, 1)
+      const eased = 1 - Math.pow(1 - p, 4)
+      setSweepAngle(eased * Math.PI * 2)
+      if (p < 1) requestAnimationFrame(anim)
+      else { setSweepAngle(Math.PI * 2); setAnimating(false) }
+    }
+    requestAnimationFrame(anim)
+  }, [])
+
+  const handleReset = useCallback(() => {
+    setSweepAngle(0.01)
+    setAnimating(false)
+    setCanvasKey((k) => k + 1)
+  }, [])
 
   if (!model) return null
 
+  const isRevolution = model.isRevolution
+
   return (
     <div className="flex flex-col gap-4">
-      {/* model-viewer with zoom control */}
+      {/* 3D Preview */}
       <div className="glass rounded-2xl overflow-hidden" style={{ minHeight: 400 }}>
+        {isRevolution ? (
+          <div style={{ width: '100%', height: 400, background: '#080812' }}>
+            <Canvas key={canvasKey} camera={{ position: [5, 3, 5], fov: 40 }} dpr={[1, 2]}>
+              <RevolutionScene model={model} sweepAngle={sweepAngle} />
+            </Canvas>
+          </div>
+        ) : (
+          <model-viewer
+            id="ar-model-viewer"
+            src={model.src}
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+            camera-controls
+            auto-rotate
+            auto-rotate-delay="0"
+            rotation-per-second="12deg"
+            shadow-intensity="1"
+            ar-placement="floor"
+            style={{ width: '100%', height: '400px', background: 'transparent' }}
+            ar-scale="fixed"
+            camera-orbit={`45deg 55deg ${(8 - scale * 6).toFixed(2)}m`}
+            min-camera-orbit="auto auto 0.5m"
+            max-camera-orbit="auto auto 12m"
+            environment-image="neutral"
+            exposure="0.8"
+          />
+        )}
+      </div>
+
+      {/* Hidden model-viewer for AR launch (revolution models only) */}
+      {isRevolution && (
         <model-viewer
           id="ar-model-viewer"
           src={model.src}
           ar
           ar-modes="webxr scene-viewer quick-look"
-          camera-controls
-          auto-rotate
-          auto-rotate-delay="0"
-          rotation-per-second="12deg"
-          shadow-intensity="1"
           ar-placement="floor"
-          style={{ width: '100%', height: '400px', background: 'transparent' }}
           ar-scale="fixed"
-          camera-orbit={`45deg 55deg ${(8 - scale * 6).toFixed(2)}m`}
-          min-camera-orbit="auto auto 0.5m"
-          max-camera-orbit="auto auto 12m"
-          environment-image="neutral"
-          exposure="0.8"
-        >
-        </model-viewer>
-      </div>
+          style={{ display: 'none' }}
+        />
+      )}
 
-      {/* AR + Animation + Reset buttons */}
+      {/* Buttons */}
       <div className="grid grid-cols-3 gap-3">
         <button
           onClick={() => {
@@ -251,26 +478,38 @@ export default function ARViewer({ selectedTopic }) {
         >
           🔮 View in AR
         </button>
-        <button
-          onClick={() => {
-            const mv = document.getElementById('ar-model-viewer')
-            if (mv) {
-              const isRotating = mv.getAttribute('auto-rotate') !== null
-              if (isRotating) {
-                mv.removeAttribute('auto-rotate')
-              } else {
-                mv.setAttribute('auto-rotate', '')
-                mv.setAttribute('auto-rotate-delay', '0')
-                mv.setAttribute('rotation-per-second', '15deg')
+
+        {isRevolution ? (
+          <button
+            onClick={handleAnimate}
+            disabled={animating}
+            className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary disabled:opacity-50"
+          >
+            {animating ? '⟳ Revolving...' : '▶ Animate'}
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              const mv = document.getElementById('ar-model-viewer')
+              if (mv) {
+                const isRotating = mv.getAttribute('auto-rotate') !== null
+                if (isRotating) {
+                  mv.removeAttribute('auto-rotate')
+                } else {
+                  mv.setAttribute('auto-rotate', '')
+                  mv.setAttribute('auto-rotate-delay', '0')
+                  mv.setAttribute('rotation-per-second', '15deg')
+                }
               }
-            }
-          }}
-          className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary"
-        >
-          ▶ Play / Pause
-        </button>
+            }}
+            className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary"
+          >
+            ▶ Play / Pause
+          </button>
+        )}
+
         <button
-          onClick={() => {
+          onClick={isRevolution ? handleReset : () => {
             const mv = document.getElementById('ar-model-viewer')
             if (mv) {
               mv.setAttribute('camera-orbit', '45deg 55deg 7.1m')
@@ -284,19 +523,35 @@ export default function ARViewer({ selectedTopic }) {
         </button>
       </div>
 
-      {/* Zoom slider */}
-      <div className="glass p-4 rounded-2xl">
-        <div className="flex justify-between mb-2">
-          <p className="text-white/50 text-sm font-heading">Zoom</p>
-          <p className="text-purple-300 text-sm font-mono font-bold">{(scale * 100).toFixed(0)}%</p>
+      {/* Sweep progress bar (revolution models) */}
+      {isRevolution && (
+        <div className="glass p-4 rounded-2xl">
+          <div className="flex justify-between mb-2">
+            <p className="text-white/50 text-sm font-heading">Rotation Angle</p>
+            <p className="text-purple-300 text-sm font-mono font-bold">{((sweepAngle / (Math.PI * 2)) * 360).toFixed(0)}°</p>
+          </div>
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
+            <div className="h-full rounded-full transition-all duration-100"
+              style={{ width: `${(sweepAngle / (Math.PI * 2)) * 100}%`, background: `linear-gradient(90deg, ${model.color}, #a78bfa)` }} />
+          </div>
         </div>
-        <input type="range" min={0.05} max={1} step={0.02} value={scale}
-          onChange={(e) => setScale(Number(e.target.value))} className="w-full accent-purple-500" />
-        <div className="flex justify-between text-xs text-white/30 mt-1">
-          <span>Zoom Out</span>
-          <span>Zoom In</span>
+      )}
+
+      {/* Zoom slider (non-revolution only) */}
+      {!isRevolution && (
+        <div className="glass p-4 rounded-2xl">
+          <div className="flex justify-between mb-2">
+            <p className="text-white/50 text-sm font-heading">Zoom</p>
+            <p className="text-purple-300 text-sm font-mono font-bold">{(scale * 100).toFixed(0)}%</p>
+          </div>
+          <input type="range" min={0.05} max={1} step={0.02} value={scale}
+            onChange={(e) => setScale(Number(e.target.value))} className="w-full accent-purple-500" />
+          <div className="flex justify-between text-xs text-white/30 mt-1">
+            <span>Zoom Out</span>
+            <span>Zoom In</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Formula */}
       <div className="glass p-4 rounded-2xl">
@@ -330,7 +585,6 @@ export default function ARViewer({ selectedTopic }) {
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden space-y-3"
               >
-                {/* Context badge */}
                 <div className="glass p-4 rounded-2xl border border-amber-500/20" style={{ background: 'rgba(245,158,11,0.06)' }}>
                   <p className="text-amber-400 text-xs font-heading font-bold uppercase tracking-wider mb-2">
                     {model.realWorld.context}
@@ -340,7 +594,6 @@ export default function ARViewer({ selectedTopic }) {
                   </p>
                 </div>
 
-                {/* Show/hide solution */}
                 <motion.button
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setShowSolution((s) => !s)}

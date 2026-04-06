@@ -234,6 +234,7 @@ function Scene({ preset, sweepAngle, wireframe }) {
       <spotLight position={[0, 8, 0]} intensity={0.8} angle={0.5} penumbra={0.5} color="#a78bfa" />
 
       <Axes3D size={3} />
+      <CurveOutline fn={preset.fn} bounds={preset.bounds} color={preset.color} />
       <Solid fn={preset.fn} bounds={preset.bounds} sweepAngle={sweepAngle} color={preset.color} wireframe={wireframe} />
       <AutoFit bounds={preset.bounds} fn={preset.fn} />
 
@@ -250,7 +251,7 @@ function Scene({ preset, sweepAngle, wireframe }) {
 
 export default function SolidOfRevModule() {
   const [presetIdx, setPresetIdx] = useState(0)
-  const [sweepAngle, setSweepAngle] = useState(Math.PI * 2)
+  const [sweepAngle, setSweepAngle] = useState(0.01)
   const [wireframe, setWireframe] = useState(true)
   const [animating, setAnimating] = useState(false)
   const [key, setKey] = useState(0)
@@ -339,7 +340,7 @@ export default function SolidOfRevModule() {
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((p, i) => (
             <motion.button key={i} whileTap={{ scale: 0.95 }}
-              onClick={() => { setPresetIdx(i); setKey((k) => k + 1); setSweepAngle(Math.PI * 2) }}
+              onClick={() => { setPresetIdx(i); setKey((k) => k + 1); setSweepAngle(0.01) }}
               className={`px-4 py-3 rounded-xl text-sm font-mono font-semibold transition-all ${
                 presetIdx === i ? 'text-white border-2' : 'text-white/50 border border-white/10 hover:border-white/30'
               }`}
