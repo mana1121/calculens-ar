@@ -16,14 +16,14 @@ function ParametricTorus() {
 
   return (
     <mesh ref={meshRef}>
-      <torusKnotGeometry args={[1, 0.3, 128, 32]} />
+      <torusKnotGeometry args={[1.2, 0.35, 128, 32]} />
       <meshStandardMaterial
         color="#667eea"
         wireframe={false}
-        metalness={0.6}
-        roughness={0.2}
+        metalness={0.5}
+        roughness={0.15}
         emissive="#764ba2"
-        emissiveIntensity={0.3}
+        emissiveIntensity={0.5}
       />
     </mesh>
   )
@@ -64,15 +64,16 @@ export default function Hero() {
         style={{ background: 'linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0d1a2e 100%)' }}
       />
 
-      {/* 3D Canvas */}
-      <div className="absolute inset-0 opacity-70">
-        <Canvas camera={{ position: [0, 0, 4], fov: 60 }}>
-          <ambientLight intensity={0.5} />
-          <pointLight position={[5, 5, 5]} intensity={1} color="#667eea" />
-          <pointLight position={[-5, -5, -5]} intensity={0.5} color="#764ba2" />
+      {/* 3D Canvas — visible on all devices */}
+      <div className="absolute inset-0 opacity-90">
+        <Canvas camera={{ position: [0, 0, 3.5], fov: 65 }} dpr={[1, 2]}>
+          <ambientLight intensity={0.6} />
+          <pointLight position={[5, 5, 5]} intensity={1.2} color="#667eea" />
+          <pointLight position={[-5, -5, -5]} intensity={0.8} color="#764ba2" />
+          <pointLight position={[0, 3, 0]} intensity={0.5} color="#a78bfa" />
           <ParametricTorus />
           <FloatingParticles />
-          <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.5} />
+          <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} autoRotate autoRotateSpeed={0.8} />
         </Canvas>
       </div>
 
