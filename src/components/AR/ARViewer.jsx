@@ -211,18 +211,21 @@ export default function ARViewer({ selectedTopic }) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* model-viewer with scale */}
-      <div className="glass rounded-2xl overflow-hidden" style={{ minHeight: 360 }}>
+      {/* model-viewer with zoom control */}
+      <div className="glass rounded-2xl overflow-hidden" style={{ minHeight: 400 }}>
         <model-viewer
+          id="ar-model-viewer"
           src={model.src}
           ar
           ar-modes="webxr scene-viewer quick-look"
           camera-controls
           auto-rotate
           shadow-intensity="1"
-          style={{ width: '100%', height: '360px', background: 'transparent', transform: `scale(${scale})`, transformOrigin: 'center center' }}
+          style={{ width: '100%', height: '400px', background: 'transparent' }}
           ar-scale="auto"
-          camera-orbit="45deg 55deg 2.5m"
+          camera-orbit={`45deg 55deg ${(3 - scale * 1.5).toFixed(2)}m`}
+          min-camera-orbit="auto auto 0.5m"
+          max-camera-orbit="auto auto 5m"
           environment-image="neutral"
           exposure="0.8"
         >
@@ -232,17 +235,17 @@ export default function ARViewer({ selectedTopic }) {
         </model-viewer>
       </div>
 
-      {/* Size slider */}
+      {/* Zoom slider */}
       <div className="glass p-4 rounded-2xl">
         <div className="flex justify-between mb-2">
-          <p className="text-white/50 text-sm font-heading">Model Size</p>
+          <p className="text-white/50 text-sm font-heading">Zoom</p>
           <p className="text-purple-300 text-sm font-mono font-bold">{(scale * 100).toFixed(0)}%</p>
         </div>
-        <input type="range" min={0.3} max={2} step={0.05} value={scale}
+        <input type="range" min={0.3} max={1.5} step={0.05} value={scale}
           onChange={(e) => setScale(Number(e.target.value))} className="w-full accent-purple-500" />
         <div className="flex justify-between text-xs text-white/30 mt-1">
-          <span>Small</span>
-          <span>Large</span>
+          <span>Zoom Out</span>
+          <span>Zoom In</span>
         </div>
       </div>
 
