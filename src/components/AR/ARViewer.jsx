@@ -220,19 +220,55 @@ export default function ARViewer({ selectedTopic }) {
           ar-modes="webxr scene-viewer quick-look"
           camera-controls
           auto-rotate
+          auto-rotate-delay="0"
+          rotation-per-second="12deg"
           shadow-intensity="1"
+          ar-placement="floor"
           style={{ width: '100%', height: '400px', background: 'transparent' }}
-          ar-scale="auto"
+          ar-scale="fixed"
           camera-orbit={`45deg 55deg ${(5 - scale * 2).toFixed(2)}m`}
           min-camera-orbit="auto auto 1m"
           max-camera-orbit="auto auto 10m"
           environment-image="neutral"
           exposure="0.8"
         >
-          <button slot="ar-button" className="ar-button">
-            🔮 View in AR
-          </button>
         </model-viewer>
+      </div>
+
+      {/* AR + Animation buttons */}
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          onClick={() => {
+            const mv = document.getElementById('ar-model-viewer')
+            if (mv && mv.canActivateAR) {
+              mv.activateAR()
+            } else {
+              alert('AR is available on mobile devices only. Open this page on your phone to use AR.')
+            }
+          }}
+          className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2"
+          style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', boxShadow: '0 0 24px rgba(102,126,234,0.4)' }}
+        >
+          🔮 View in AR
+        </button>
+        <button
+          onClick={() => {
+            const mv = document.getElementById('ar-model-viewer')
+            if (mv) {
+              const isRotating = mv.getAttribute('auto-rotate') !== null
+              if (isRotating) {
+                mv.removeAttribute('auto-rotate')
+              } else {
+                mv.setAttribute('auto-rotate', '')
+                mv.setAttribute('auto-rotate-delay', '0')
+                mv.setAttribute('rotation-per-second', '15deg')
+              }
+            }
+          }}
+          className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary"
+        >
+          ▶ Play / Pause
+        </button>
       </div>
 
       {/* Zoom slider */}

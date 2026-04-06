@@ -90,9 +90,16 @@
   }
 }
 
-/* model-viewer AR button */
+/* model-viewer AR button — keep visible on mobile */
 model-viewer::part(default-ar-button) {
-  display: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
 }
 
 .ar-button {
