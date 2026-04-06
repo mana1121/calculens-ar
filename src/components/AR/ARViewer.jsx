@@ -203,7 +203,7 @@ const AR_MODELS = {
 
 export default function ARViewer({ selectedTopic }) {
   const model = AR_MODELS[selectedTopic]
-  const [scale, setScale] = useState(1)
+  const [scale, setScale] = useState(0.5)
   const [showProblem, setShowProblem] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
 
@@ -223,9 +223,9 @@ export default function ARViewer({ selectedTopic }) {
           shadow-intensity="1"
           style={{ width: '100%', height: '400px', background: 'transparent' }}
           ar-scale="auto"
-          camera-orbit={`45deg 55deg ${(3 - scale * 1.5).toFixed(2)}m`}
-          min-camera-orbit="auto auto 0.5m"
-          max-camera-orbit="auto auto 5m"
+          camera-orbit={`45deg 55deg ${(5 - scale * 2).toFixed(2)}m`}
+          min-camera-orbit="auto auto 1m"
+          max-camera-orbit="auto auto 10m"
           environment-image="neutral"
           exposure="0.8"
         >
