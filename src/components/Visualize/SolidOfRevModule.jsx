@@ -19,7 +19,7 @@ function Solid({ fn, bounds, sweepAngle, color, wireframe }) {
   const [a, b] = bounds
 
   useFrame((_, dt) => {
-    if (groupRef.current) groupRef.current.rotation.x += dt * 0.15
+    if (groupRef.current) groupRef.current.rotation.x += dt * 0.05
   })
 
   const geo = useMemo(() => {
@@ -261,7 +261,7 @@ export default function SolidOfRevModule() {
     setSweepAngle(0.01)
     setAnimating(true)
     let start = null
-    const duration = 2500
+    const duration = 4000
     const anim = (ts) => {
       if (!start) start = ts
       const p = Math.min((ts - start) / duration, 1)
