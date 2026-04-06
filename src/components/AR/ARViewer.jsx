@@ -399,7 +399,7 @@ export default function ARViewer({ selectedTopic }) {
   const [sweepAngle, setSweepAngle] = useState(0.01)
   const [animating, setAnimating] = useState(false)
   const [canvasKey, setCanvasKey] = useState(0)
-  const [arScale, setArScale] = useState(1)
+  const [arScale, setArScale] = useState(2)
 
   const handleAnimate = useCallback(() => {
     setSweepAngle(0.01)
@@ -421,7 +421,14 @@ export default function ARViewer({ selectedTopic }) {
     setSweepAngle(0.01)
     setAnimating(false)
     setCanvasKey((k) => k + 1)
-    setArScale(1)
+    setArScale(2)
+  }, [])
+
+  // Update model-viewer scale when arScale changes
+  const updateArScale = useCallback((newScale) => {
+    setArScale(newScale)
+    const mv = document.getElementById('ar-model-viewer')
+    if (mv) mv.setAttribute('scale', `${newScale} ${newScale} ${newScale}`)
   }, [])
 
   if (!model) return null
@@ -430,60 +437,92 @@ export default function ARViewer({ selectedTopic }) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* 3D Preview */}
-      <div className="glass rounded-2xl overflow-hidden" style={{ minHeight: 400 }}>
-        {isRevolution ? (
-          <div style={{ width: '100%', height: 400, background: '#080812' }}>
+      {/* 3D Preview — Canvas for revolution animation */}
+      {isRevolution && (
+        <div className="glass rounded-2xl overflow-hidden" style={{ minHeight: 350 }}>
+          <div style={{ width: '100%', height: 350, background: '#080812' }}>
             <Canvas key={canvasKey} camera={{ position: [5, 3, 5], fov: 40 }} dpr={[1, 2]}>
               <RevolutionScene model={model} sweepAngle={sweepAngle} />
             </Canvas>
           </div>
-        ) : (
-          <model-viewer
-            id="ar-model-viewer"
-            src={model.src}
-            ar
-            ar-modes="webxr scene-viewer quick-look"
-            camera-controls
-            auto-rotate
-            auto-rotate-delay="0"
-            rotation-per-second="12deg"
-            shadow-intensity="1"
-            ar-placement="floor"
-            style={{ width: '100%', height: '400px', background: 'transparent' }}
-            ar-scale="auto"
-            scale={`${arScale} ${arScale} ${arScale}`}
-            camera-orbit={`45deg 55deg ${(8 - scale * 6).toFixed(2)}m`}
-            min-camera-orbit="auto auto 0.5m"
-            max-camera-orbit="auto auto 12m"
-            environment-image="neutral"
-            exposure="0.8"
-          />
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Hidden model-viewer for AR launch (revolution models only) */}
-      {isRevolution && (
+      {/* model-viewer — visible for ALL models, used for AR launch */}
+      {/* On WebXR devices: child elements become DOM overlay (slider in AR view) */}
+      {/* On other devices: Scene Viewer / Quick Look launches with pre-set scale */}
+      <div className="glass rounded-2xl overflow-hidden" style={{ minHeight: isRevolution ? 200 : 400 }}>
         <model-viewer
           id="ar-model-viewer"
           src={model.src}
           ar
           ar-modes="webxr scene-viewer quick-look"
+          camera-controls
+          auto-rotate
+          auto-rotate-delay="0"
+          rotation-per-second="12deg"
+          shadow-intensity="1"
           ar-placement="floor"
-          ar-scale="auto"
+          style={{ width: '100%', height: isRevolution ? '200px' : '400px', background: 'transparent' }}
+          ar-scale="fixed"
           scale={`${arScale} ${arScale} ${arScale}`}
-          style={{ display: 'none' }}
-        />
-      )}
+          camera-orbit={`45deg 55deg ${(8 - scale * 6).toFixed(2)}m`}
+          min-camera-orbit="auto auto 0.5m"
+          max-camera-orbit="auto auto 12m"
+          environment-image="neutral"
+          exposure="0.8"
+        >
+          {/* DOM overlay — appears inside AR camera view on WebXR devices */}
+          <div
+            className="ar-overlay"
+            style={{
+              position: 'absolute',
+              bottom: '100px',
+              left: '16px',
+              right: '16px',
+              background: 'rgba(0,0,0,0.7)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '16px',
+              padding: '16px',
+              display: 'none',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px' }}>AR Size</span>
+              <span style={{ color: '#a78bfa', fontSize: '14px', fontWeight: 'bold' }} id="ar-scale-label">200%</span>
+            </div>
+            <input
+              type="range"
+              min="0.5"
+              max="5"
+              step="0.1"
+              defaultValue="2"
+              id="ar-scale-slider"
+              style={{ width: '100%', accentColor: '#a78bfa' }}
+              onInput={(e) => {
+                const val = Number(e.target.value)
+                const mv = document.getElementById('ar-model-viewer')
+                if (mv) mv.setAttribute('scale', `${val} ${val} ${val}`)
+                const label = document.getElementById('ar-scale-label')
+                if (label) label.textContent = `${(val * 100).toFixed(0)}%`
+              }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>
+              <span>Small</span>
+              <span>Large</span>
+            </div>
+          </div>
+        </model-viewer>
+      </div>
 
-      {/* AR Size slider */}
+      {/* Page-level AR Size slider — works on all devices */}
       <div className="glass p-4 rounded-2xl">
         <div className="flex justify-between mb-2">
-          <p className="text-white/50 text-sm font-heading">AR Size</p>
+          <p className="text-white/50 text-sm font-heading">AR Size (set before launching)</p>
           <p className="text-purple-300 text-sm font-mono font-bold">{(arScale * 100).toFixed(0)}%</p>
         </div>
-        <input type="range" min={0.5} max={3} step={0.1} value={arScale}
-          onChange={(e) => setArScale(Number(e.target.value))} className="w-full accent-purple-500" />
+        <input type="range" min={0.5} max={5} step={0.1} value={arScale}
+          onChange={(e) => updateArScale(Number(e.target.value))} className="w-full accent-purple-500" />
         <div className="flex justify-between text-xs text-white/30 mt-1">
           <span>Small</span>
           <span>Large</span>
@@ -497,6 +536,9 @@ export default function ARViewer({ selectedTopic }) {
             const mv = document.getElementById('ar-model-viewer')
             if (mv && mv.canActivateAR) {
               mv.setAttribute('scale', `${arScale} ${arScale} ${arScale}`)
+              // Show DOM overlay slider during AR
+              const overlay = mv.querySelector('.ar-overlay')
+              if (overlay) overlay.style.display = 'block'
               mv.activateAR()
             } else {
               alert('AR is available on mobile devices only. Open this page on your phone to use AR.')
@@ -544,7 +586,7 @@ export default function ARViewer({ selectedTopic }) {
               mv.setAttribute('camera-orbit', '45deg 55deg 7.1m')
               mv.setAttribute('auto-rotate', '')
               setScale(0.15)
-              setArScale(1)
+              setArScale(2)
             }
           }}
           className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary"
@@ -563,22 +605,6 @@ export default function ARViewer({ selectedTopic }) {
           <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
             <div className="h-full rounded-full transition-all duration-100"
               style={{ width: `${(sweepAngle / (Math.PI * 2)) * 100}%`, background: `linear-gradient(90deg, ${model.color}, #a78bfa)` }} />
-          </div>
-        </div>
-      )}
-
-      {/* Zoom slider (non-revolution only) */}
-      {!isRevolution && (
-        <div className="glass p-4 rounded-2xl">
-          <div className="flex justify-between mb-2">
-            <p className="text-white/50 text-sm font-heading">Zoom</p>
-            <p className="text-purple-300 text-sm font-mono font-bold">{(scale * 100).toFixed(0)}%</p>
-          </div>
-          <input type="range" min={0.05} max={1} step={0.02} value={scale}
-            onChange={(e) => setScale(Number(e.target.value))} className="w-full accent-purple-500" />
-          <div className="flex justify-between text-xs text-white/30 mt-1">
-            <span>Zoom Out</span>
-            <span>Zoom In</span>
           </div>
         </div>
       )}
