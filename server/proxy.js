@@ -13,6 +13,7 @@ app.use(express.json({ limit: '20mb' }))
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages'
 const MODEL = 'claude-haiku-4-5-20251001'
+const API_KEY = (process.env.ANTHROPIC_API_KEY || '').replace(/[\r\n\s]/g, '')
 
 // Chat endpoint
 app.post('/api/chat', async (req, res) => {
@@ -23,7 +24,7 @@ app.post('/api/chat', async (req, res) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'x-api-key': API_KEY,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
@@ -56,7 +57,7 @@ app.post('/api/snap', async (req, res) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'x-api-key': API_KEY,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
