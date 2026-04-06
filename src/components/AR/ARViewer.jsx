@@ -234,6 +234,7 @@ function RevolutionSolid({ fn, bounds, sweepAngle, color }) {
   const groupRef = useRef()
   const [a, b] = bounds
   const showSolid = sweepAngle > 0.15
+  const mid = (a + b) / 2
 
   useFrame((_, dt) => {
     if (groupRef.current) groupRef.current.rotation.x += dt * 0.05
@@ -258,49 +259,50 @@ function RevolutionSolid({ fn, bounds, sweepAngle, color }) {
     return g
   }, [fn, a, b, sweepAngle, showSolid])
 
-  if (!showSolid || !geo) return null
-
-  return (
-    <group ref={groupRef} rotation={[0.3, 0, 0]}>
-      <mesh geometry={geo}>
-        <meshPhysicalMaterial
-          color={color}
-          transparent
-          opacity={0.8}
-          side={THREE.DoubleSide}
-          metalness={0.15}
-          roughness={0.1}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
-          emissive={color}
-          emissiveIntensity={0.05}
-        />
-      </mesh>
-      <mesh geometry={geo}>
-        <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
-      </mesh>
-    </group>
-  )
-}
-
-function CurveOutline({ fn, bounds }) {
-  const [a, b] = bounds
-
-  const tubeGeo = useMemo(() => {
+  // Curve outline in the same coordinate space as the solid
+  // LatheGeometry profile at angle 0: (f(x), x, 0)
+  // After center translate: (f(x), x - mid, 0)
+  // After rotateZ(π/2): (-(x - mid), f(x), 0) = (mid - x, f(x), 0)
+  const curveGeo = useMemo(() => {
     const curvePts = []
     for (let i = 0; i <= 100; i++) {
       const x = a + (b - a) * (i / 100)
       const y = fn(x)
-      curvePts.push(new THREE.Vector3(x - (a + b) / 2, y, 0))
+      curvePts.push(new THREE.Vector3(mid - x, y, 0))
     }
     const curve = new THREE.CatmullRomCurve3(curvePts)
     return new THREE.TubeGeometry(curve, 100, 0.04, 8, false)
-  }, [fn, a, b])
+  }, [fn, a, b, mid])
 
   return (
-    <mesh geometry={tubeGeo}>
-      <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={0.6} />
-    </mesh>
+    <group ref={groupRef} rotation={[0.3, 0, 0]}>
+      {/* 2D generating curve — always visible */}
+      <mesh geometry={curveGeo}>
+        <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={0.6} />
+      </mesh>
+      {/* 3D solid — only visible after sweep starts */}
+      {showSolid && geo && (
+        <>
+          <mesh geometry={geo}>
+            <meshPhysicalMaterial
+              color={color}
+              transparent
+              opacity={0.8}
+              side={THREE.DoubleSide}
+              metalness={0.15}
+              roughness={0.1}
+              clearcoat={1}
+              clearcoatRoughness={0.1}
+              emissive={color}
+              emissiveIntensity={0.05}
+            />
+          </mesh>
+          <mesh geometry={geo}>
+            <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
+          </mesh>
+        </>
+      )}
+    </group>
   )
 }
 
@@ -374,7 +376,6 @@ function RevolutionScene({ model, sweepAngle }) {
       <pointLight position={[0, -3, 0]} intensity={0.3} color="#764ba2" />
 
       <Axes3D size={3} />
-      <CurveOutline fn={model.fn} bounds={model.bounds} />
       <RevolutionSolid fn={model.fn} bounds={model.bounds} sweepAngle={sweepAngle} color={model.color} />
       <AutoFitAR bounds={model.bounds} fn={model.fn} />
 

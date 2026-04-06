@@ -18,6 +18,7 @@ function Solid({ fn, bounds, sweepAngle, color, wireframe }) {
   const groupRef = useRef()
   const [a, b] = bounds
   const showSolid = sweepAngle > 0.15
+  const mid = (a + b) / 2
 
   useFrame((_, dt) => {
     if (groupRef.current) groupRef.current.rotation.x += dt * 0.05
@@ -42,58 +43,59 @@ function Solid({ fn, bounds, sweepAngle, color, wireframe }) {
     return g
   }, [fn, a, b, sweepAngle, showSolid])
 
-  if (!showSolid || !geo) return null
-
-  return (
-    <group ref={groupRef} rotation={[0.3, 0, 0]}>
-      {/* Main solid */}
-      <mesh geometry={geo} scale={1}>
-        <meshPhysicalMaterial
-          color={color}
-          transparent
-          opacity={0.8}
-          side={THREE.DoubleSide}
-          metalness={0.15}
-          roughness={0.1}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
-          envMapIntensity={0.8}
-          emissive={color}
-          emissiveIntensity={0.05}
-        />
-      </mesh>
-      {/* Wireframe overlay */}
-      {wireframe && (
-        <mesh geometry={geo} scale={1}>
-          <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
-        </mesh>
-      )}
-      {/* Inner glow mesh */}
-      <mesh geometry={geo} scale={0.995}>
-        <meshBasicMaterial color={color} transparent opacity={0.05} side={THREE.BackSide} />
-      </mesh>
-    </group>
-  )
-}
-
-function CurveOutline({ fn, bounds, color }) {
-  const [a, b] = bounds
-
-  const tubeGeo = useMemo(() => {
+  // Curve outline in the same coordinate space as the solid
+  // LatheGeometry profile at angle 0: (f(x), x, 0)
+  // After center translate: (f(x), x - mid, 0)
+  // After rotateZ(π/2): (-(x - mid), f(x), 0) = (mid - x, f(x), 0)
+  const curveGeo = useMemo(() => {
     const curvePts = []
     for (let i = 0; i <= 100; i++) {
       const x = a + (b - a) * (i / 100)
       const y = fn(x)
-      curvePts.push(new THREE.Vector3(x - (a + b) / 2, y, 0))
+      curvePts.push(new THREE.Vector3(mid - x, y, 0))
     }
     const curve = new THREE.CatmullRomCurve3(curvePts)
     return new THREE.TubeGeometry(curve, 100, 0.04, 8, false)
-  }, [fn, a, b])
+  }, [fn, a, b, mid])
 
   return (
-    <mesh geometry={tubeGeo}>
-      <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={0.6} />
-    </mesh>
+    <group ref={groupRef} rotation={[0.3, 0, 0]}>
+      {/* 2D generating curve — always visible */}
+      <mesh geometry={curveGeo}>
+        <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={0.6} />
+      </mesh>
+      {/* 3D solid — only visible after sweep starts */}
+      {showSolid && geo && (
+        <>
+          {/* Main solid */}
+          <mesh geometry={geo} scale={1}>
+            <meshPhysicalMaterial
+              color={color}
+              transparent
+              opacity={0.8}
+              side={THREE.DoubleSide}
+              metalness={0.15}
+              roughness={0.1}
+              clearcoat={1}
+              clearcoatRoughness={0.1}
+              envMapIntensity={0.8}
+              emissive={color}
+              emissiveIntensity={0.05}
+            />
+          </mesh>
+          {/* Wireframe overlay */}
+          {wireframe && (
+            <mesh geometry={geo} scale={1}>
+              <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
+            </mesh>
+          )}
+          {/* Inner glow mesh */}
+          <mesh geometry={geo} scale={0.995}>
+            <meshBasicMaterial color={color} transparent opacity={0.05} side={THREE.BackSide} />
+          </mesh>
+        </>
+      )}
+    </group>
   )
 }
 
@@ -233,7 +235,6 @@ function Scene({ preset, sweepAngle, wireframe }) {
       <spotLight position={[0, 8, 0]} intensity={0.8} angle={0.5} penumbra={0.5} color="#a78bfa" />
 
       <Axes3D size={3} />
-      <CurveOutline fn={preset.fn} bounds={preset.bounds} color={preset.color} />
       <Solid fn={preset.fn} bounds={preset.bounds} sweepAngle={sweepAngle} color={preset.color} wireframe={wireframe} />
       <AutoFit bounds={preset.bounds} fn={preset.fn} />
 
