@@ -235,8 +235,8 @@ export default function ARViewer({ selectedTopic }) {
         </model-viewer>
       </div>
 
-      {/* AR + Animation buttons */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* AR + Animation + Reset buttons */}
+      <div className="grid grid-cols-3 gap-3">
         <button
           onClick={() => {
             const mv = document.getElementById('ar-model-viewer')
@@ -268,6 +268,19 @@ export default function ARViewer({ selectedTopic }) {
           className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary"
         >
           ▶ Play / Pause
+        </button>
+        <button
+          onClick={() => {
+            const mv = document.getElementById('ar-model-viewer')
+            if (mv) {
+              mv.setAttribute('camera-orbit', '45deg 55deg 7.1m')
+              mv.setAttribute('auto-rotate', '')
+              setScale(0.15)
+            }
+          }}
+          className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary"
+        >
+          ↩ Reset
         </button>
       </div>
 
