@@ -230,18 +230,39 @@ const AR_MODELS = {
 
 // ─── 3D Components for Revolution Animation ───
 
+// 2D curve in world space — standard math: x along X-axis, f(x) along Y-axis
+function CurvePreview({ fn, bounds }) {
+  const [a, b] = bounds
+
+  const curveGeo = useMemo(() => {
+    const curvePts = []
+    for (let i = 0; i <= 100; i++) {
+      const x = a + (b - a) * (i / 100)
+      const y = fn(x)
+      curvePts.push(new THREE.Vector3(x, y, 0))
+    }
+    const curve = new THREE.CatmullRomCurve3(curvePts)
+    return new THREE.TubeGeometry(curve, 100, 0.045, 8, false)
+  }, [fn, a, b])
+
+  return (
+    <mesh geometry={curveGeo}>
+      <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={0.8} />
+    </mesh>
+  )
+}
+
+// 3D solid of revolution
 function RevolutionSolid({ fn, bounds, sweepAngle, color }) {
   const groupRef = useRef()
   const [a, b] = bounds
-  const showSolid = sweepAngle > 0.15
-  const mid = (a + b) / 2
 
   useFrame((_, dt) => {
-    if (groupRef.current) groupRef.current.rotation.x += dt * 0.05
+    if (groupRef.current) groupRef.current.rotation.y += dt * 0.15
   })
 
+  // Build geometry with axis of revolution along X
   const geo = useMemo(() => {
-    if (!showSolid) return null
     const pts = []
     const N = 150
     for (let i = 0; i <= N; i++) {
@@ -257,51 +278,27 @@ function RevolutionSolid({ fn, bounds, sweepAngle, color }) {
     g.translate(-c.x, -c.y, -c.z)
     g.rotateZ(Math.PI / 2)
     return g
-  }, [fn, a, b, sweepAngle, showSolid])
-
-  // Curve outline in the same coordinate space as the solid
-  // LatheGeometry profile at angle 0: (f(x), x, 0)
-  // After center translate: (f(x), x - mid, 0)
-  // After rotateZ(π/2): (-(x - mid), f(x), 0) = (mid - x, f(x), 0)
-  const curveGeo = useMemo(() => {
-    const curvePts = []
-    for (let i = 0; i <= 100; i++) {
-      const x = a + (b - a) * (i / 100)
-      const y = fn(x)
-      curvePts.push(new THREE.Vector3(mid - x, y, 0))
-    }
-    const curve = new THREE.CatmullRomCurve3(curvePts)
-    return new THREE.TubeGeometry(curve, 100, 0.04, 8, false)
-  }, [fn, a, b, mid])
+  }, [fn, a, b, sweepAngle])
 
   return (
-    <group ref={groupRef} rotation={[0.3, 0, 0]}>
-      {/* 2D generating curve — always visible */}
-      <mesh geometry={curveGeo}>
-        <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={0.6} />
+    <group ref={groupRef}>
+      <mesh geometry={geo}>
+        <meshPhysicalMaterial
+          color={color}
+          transparent
+          opacity={0.8}
+          side={THREE.DoubleSide}
+          metalness={0.15}
+          roughness={0.1}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
+          emissive={color}
+          emissiveIntensity={0.05}
+        />
       </mesh>
-      {/* 3D solid — only visible after sweep starts */}
-      {showSolid && geo && (
-        <>
-          <mesh geometry={geo}>
-            <meshPhysicalMaterial
-              color={color}
-              transparent
-              opacity={0.8}
-              side={THREE.DoubleSide}
-              metalness={0.15}
-              roughness={0.1}
-              clearcoat={1}
-              clearcoatRoughness={0.1}
-              emissive={color}
-              emissiveIntensity={0.05}
-            />
-          </mesh>
-          <mesh geometry={geo}>
-            <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
-          </mesh>
-        </>
-      )}
+      <mesh geometry={geo}>
+        <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
+      </mesh>
     </group>
   )
 }
@@ -366,6 +363,8 @@ function AutoFitAR({ bounds, fn }) {
 }
 
 function RevolutionScene({ model, sweepAngle }) {
+  const showSolid = sweepAngle > 0.15
+
   return (
     <>
       <color attach="background" args={['#080812']} />
@@ -376,7 +375,13 @@ function RevolutionScene({ model, sweepAngle }) {
       <pointLight position={[0, -3, 0]} intensity={0.3} color="#764ba2" />
 
       <Axes3D size={3} />
-      <RevolutionSolid fn={model.fn} bounds={model.bounds} sweepAngle={sweepAngle} color={model.color} />
+
+      {/* Before animation: show 2D curve in standard math orientation */}
+      {!showSolid && <CurvePreview fn={model.fn} bounds={model.bounds} />}
+
+      {/* During/after animation: show the 3D solid */}
+      {showSolid && <RevolutionSolid fn={model.fn} bounds={model.bounds} sweepAngle={sweepAngle} color={model.color} />}
+
       <AutoFitAR bounds={model.bounds} fn={model.fn} />
 
       <OrbitControls enablePan={false} minDistance={2} maxDistance={15} target={[0, 0, 0]} />

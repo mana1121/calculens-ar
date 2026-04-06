@@ -14,18 +14,38 @@ const PRESETS = [
   { label: 'y = 1/x', fn: (x) => 1 / x, fnStr: '\\frac{1}{x}', bounds: [1, 3], volume: '\\frac{2\\pi}{3} \\approx 2.09', color: '#f87171' },
 ]
 
+// 2D curve in world space — standard math: x along X-axis, f(x) along Y-axis
+function CurvePreview({ fn, bounds }) {
+  const [a, b] = bounds
+
+  const curveGeo = useMemo(() => {
+    const curvePts = []
+    for (let i = 0; i <= 100; i++) {
+      const x = a + (b - a) * (i / 100)
+      const y = fn(x)
+      curvePts.push(new THREE.Vector3(x, y, 0))
+    }
+    const curve = new THREE.CatmullRomCurve3(curvePts)
+    return new THREE.TubeGeometry(curve, 100, 0.045, 8, false)
+  }, [fn, a, b])
+
+  return (
+    <mesh geometry={curveGeo}>
+      <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={0.8} />
+    </mesh>
+  )
+}
+
+// 3D solid of revolution
 function Solid({ fn, bounds, sweepAngle, color, wireframe }) {
   const groupRef = useRef()
   const [a, b] = bounds
-  const showSolid = sweepAngle > 0.15
-  const mid = (a + b) / 2
 
   useFrame((_, dt) => {
-    if (groupRef.current) groupRef.current.rotation.x += dt * 0.05
+    if (groupRef.current) groupRef.current.rotation.y += dt * 0.15
   })
 
   const geo = useMemo(() => {
-    if (!showSolid) return null
     const pts = []
     const N = 150
     for (let i = 0; i <= N; i++) {
@@ -41,60 +61,36 @@ function Solid({ fn, bounds, sweepAngle, color, wireframe }) {
     g.translate(-c.x, -c.y, -c.z)
     g.rotateZ(Math.PI / 2)
     return g
-  }, [fn, a, b, sweepAngle, showSolid])
-
-  // Curve outline in the same coordinate space as the solid
-  // LatheGeometry profile at angle 0: (f(x), x, 0)
-  // After center translate: (f(x), x - mid, 0)
-  // After rotateZ(π/2): (-(x - mid), f(x), 0) = (mid - x, f(x), 0)
-  const curveGeo = useMemo(() => {
-    const curvePts = []
-    for (let i = 0; i <= 100; i++) {
-      const x = a + (b - a) * (i / 100)
-      const y = fn(x)
-      curvePts.push(new THREE.Vector3(mid - x, y, 0))
-    }
-    const curve = new THREE.CatmullRomCurve3(curvePts)
-    return new THREE.TubeGeometry(curve, 100, 0.04, 8, false)
-  }, [fn, a, b, mid])
+  }, [fn, a, b, sweepAngle])
 
   return (
-    <group ref={groupRef} rotation={[0.3, 0, 0]}>
-      {/* 2D generating curve — always visible */}
-      <mesh geometry={curveGeo}>
-        <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={0.6} />
+    <group ref={groupRef}>
+      {/* Main solid */}
+      <mesh geometry={geo} scale={1}>
+        <meshPhysicalMaterial
+          color={color}
+          transparent
+          opacity={0.8}
+          side={THREE.DoubleSide}
+          metalness={0.15}
+          roughness={0.1}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
+          envMapIntensity={0.8}
+          emissive={color}
+          emissiveIntensity={0.05}
+        />
       </mesh>
-      {/* 3D solid — only visible after sweep starts */}
-      {showSolid && geo && (
-        <>
-          {/* Main solid */}
-          <mesh geometry={geo} scale={1}>
-            <meshPhysicalMaterial
-              color={color}
-              transparent
-              opacity={0.8}
-              side={THREE.DoubleSide}
-              metalness={0.15}
-              roughness={0.1}
-              clearcoat={1}
-              clearcoatRoughness={0.1}
-              envMapIntensity={0.8}
-              emissive={color}
-              emissiveIntensity={0.05}
-            />
-          </mesh>
-          {/* Wireframe overlay */}
-          {wireframe && (
-            <mesh geometry={geo} scale={1}>
-              <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
-            </mesh>
-          )}
-          {/* Inner glow mesh */}
-          <mesh geometry={geo} scale={0.995}>
-            <meshBasicMaterial color={color} transparent opacity={0.05} side={THREE.BackSide} />
-          </mesh>
-        </>
+      {/* Wireframe overlay */}
+      {wireframe && (
+        <mesh geometry={geo} scale={1}>
+          <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
+        </mesh>
       )}
+      {/* Inner glow mesh */}
+      <mesh geometry={geo} scale={0.995}>
+        <meshBasicMaterial color={color} transparent opacity={0.05} side={THREE.BackSide} />
+      </mesh>
     </group>
   )
 }
@@ -224,6 +220,8 @@ function AutoFit({ bounds, fn }) {
 }
 
 function Scene({ preset, sweepAngle, wireframe }) {
+  const showSolid = sweepAngle > 0.15
+
   return (
     <>
       <color attach="background" args={['#080812']} />
@@ -235,7 +233,13 @@ function Scene({ preset, sweepAngle, wireframe }) {
       <spotLight position={[0, 8, 0]} intensity={0.8} angle={0.5} penumbra={0.5} color="#a78bfa" />
 
       <Axes3D size={3} />
-      <Solid fn={preset.fn} bounds={preset.bounds} sweepAngle={sweepAngle} color={preset.color} wireframe={wireframe} />
+
+      {/* Before animation: show 2D curve in standard math orientation */}
+      {!showSolid && <CurvePreview fn={preset.fn} bounds={preset.bounds} />}
+
+      {/* During/after animation: show the 3D solid */}
+      {showSolid && <Solid fn={preset.fn} bounds={preset.bounds} sweepAngle={sweepAngle} color={preset.color} wireframe={wireframe} />}
+
       <AutoFit bounds={preset.bounds} fn={preset.fn} />
 
       {/* Ground reflection */}
