@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls, Text } from '@react-three/drei'
@@ -399,7 +399,19 @@ export default function ARViewer({ selectedTopic }) {
   const [sweepAngle, setSweepAngle] = useState(0.01)
   const [animating, setAnimating] = useState(false)
   const [canvasKey, setCanvasKey] = useState(0)
-  const [arScale, setArScale] = useState(2)
+  const [arReady, setArReady] = useState(false)
+
+  // Wait for model-viewer to fully load the GLB before enabling AR
+  useEffect(() => {
+    setArReady(false)
+    const check = () => {
+      const mv = document.getElementById('ar-model-viewer')
+      if (mv && mv.loaded) { setArReady(true); return }
+      if (mv) mv.addEventListener('load', () => setArReady(true), { once: true })
+    }
+    const t = setTimeout(check, 300)
+    return () => clearTimeout(t)
+  }, [selectedTopic])
 
   const handleAnimate = useCallback(() => {
     setSweepAngle(0.01)
@@ -421,14 +433,7 @@ export default function ARViewer({ selectedTopic }) {
     setSweepAngle(0.01)
     setAnimating(false)
     setCanvasKey((k) => k + 1)
-    setArScale(2)
-  }, [])
-
-  // Update model-viewer scale when arScale changes
-  const updateArScale = useCallback((newScale) => {
-    setArScale(newScale)
-    const mv = document.getElementById('ar-model-viewer')
-    if (mv) mv.setAttribute('scale', `${newScale} ${newScale} ${newScale}`)
+    setArReady(false)
   }, [])
 
   if (!model) return null
@@ -448,9 +453,7 @@ export default function ARViewer({ selectedTopic }) {
         </div>
       )}
 
-      {/* model-viewer — visible for ALL models, used for AR launch */}
-      {/* On WebXR devices: child elements become DOM overlay (slider in AR view) */}
-      {/* On other devices: Scene Viewer / Quick Look launches with pre-set scale */}
+      {/* model-viewer for AR launch — visible preview of GLB model */}
       <div className="glass rounded-2xl overflow-hidden" style={{ minHeight: isRevolution ? 200 : 400 }}>
         <model-viewer
           id="ar-model-viewer"
@@ -464,69 +467,13 @@ export default function ARViewer({ selectedTopic }) {
           shadow-intensity="1"
           ar-placement="floor"
           style={{ width: '100%', height: isRevolution ? '200px' : '400px', background: 'transparent' }}
-          ar-scale="fixed"
-          scale={`${arScale} ${arScale} ${arScale}`}
+          scale="3 3 3"
           camera-orbit={`45deg 55deg ${(8 - scale * 6).toFixed(2)}m`}
           min-camera-orbit="auto auto 0.5m"
           max-camera-orbit="auto auto 12m"
           environment-image="neutral"
           exposure="0.8"
-        >
-          {/* DOM overlay — appears inside AR camera view on WebXR devices */}
-          <div
-            className="ar-overlay"
-            style={{
-              position: 'absolute',
-              bottom: '100px',
-              left: '16px',
-              right: '16px',
-              background: 'rgba(0,0,0,0.7)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '16px',
-              padding: '16px',
-              display: 'none',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px' }}>AR Size</span>
-              <span style={{ color: '#a78bfa', fontSize: '14px', fontWeight: 'bold' }} id="ar-scale-label">200%</span>
-            </div>
-            <input
-              type="range"
-              min="0.5"
-              max="5"
-              step="0.1"
-              defaultValue="2"
-              id="ar-scale-slider"
-              style={{ width: '100%', accentColor: '#a78bfa' }}
-              onInput={(e) => {
-                const val = Number(e.target.value)
-                const mv = document.getElementById('ar-model-viewer')
-                if (mv) mv.setAttribute('scale', `${val} ${val} ${val}`)
-                const label = document.getElementById('ar-scale-label')
-                if (label) label.textContent = `${(val * 100).toFixed(0)}%`
-              }}
-            />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>
-              <span>Small</span>
-              <span>Large</span>
-            </div>
-          </div>
-        </model-viewer>
-      </div>
-
-      {/* Page-level AR Size slider — works on all devices */}
-      <div className="glass p-4 rounded-2xl">
-        <div className="flex justify-between mb-2">
-          <p className="text-white/50 text-sm font-heading">AR Size (set before launching)</p>
-          <p className="text-purple-300 text-sm font-mono font-bold">{(arScale * 100).toFixed(0)}%</p>
-        </div>
-        <input type="range" min={0.5} max={5} step={0.1} value={arScale}
-          onChange={(e) => updateArScale(Number(e.target.value))} className="w-full accent-purple-500" />
-        <div className="flex justify-between text-xs text-white/30 mt-1">
-          <span>Small</span>
-          <span>Large</span>
-        </div>
+        />
       </div>
 
       {/* Buttons */}
@@ -534,20 +481,21 @@ export default function ARViewer({ selectedTopic }) {
         <button
           onClick={() => {
             const mv = document.getElementById('ar-model-viewer')
-            if (mv && mv.canActivateAR) {
-              mv.setAttribute('scale', `${arScale} ${arScale} ${arScale}`)
-              // Show DOM overlay slider during AR
-              const overlay = mv.querySelector('.ar-overlay')
-              if (overlay) overlay.style.display = 'block'
+            if (!mv) return
+            if (!arReady) {
+              alert('Model is still loading. Please wait a moment and try again.')
+              return
+            }
+            if (mv.canActivateAR) {
               mv.activateAR()
             } else {
               alert('AR is available on mobile devices only. Open this page on your phone to use AR.')
             }
           }}
-          className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2"
+          className={`py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 ${!arReady ? 'opacity-60' : ''}`}
           style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', boxShadow: '0 0 24px rgba(102,126,234,0.4)' }}
         >
-          🔮 View in AR
+          {arReady ? '🔮 View in AR' : '⏳ Loading...'}
         </button>
 
         {isRevolution ? (
@@ -586,7 +534,6 @@ export default function ARViewer({ selectedTopic }) {
               mv.setAttribute('camera-orbit', '45deg 55deg 7.1m')
               mv.setAttribute('auto-rotate', '')
               setScale(0.15)
-              setArScale(2)
             }
           }}
           className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary"
