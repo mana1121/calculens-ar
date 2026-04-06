@@ -203,7 +203,7 @@ const AR_MODELS = {
 
 export default function ARViewer({ selectedTopic }) {
   const model = AR_MODELS[selectedTopic]
-  const [scale, setScale] = useState(0.5)
+  const [scale, setScale] = useState(0.15)
   const [showProblem, setShowProblem] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
 
@@ -226,9 +226,9 @@ export default function ARViewer({ selectedTopic }) {
           ar-placement="floor"
           style={{ width: '100%', height: '400px', background: 'transparent' }}
           ar-scale="fixed"
-          camera-orbit={`45deg 55deg ${(5 - scale * 2).toFixed(2)}m`}
-          min-camera-orbit="auto auto 1m"
-          max-camera-orbit="auto auto 10m"
+          camera-orbit={`45deg 55deg ${(8 - scale * 6).toFixed(2)}m`}
+          min-camera-orbit="auto auto 0.5m"
+          max-camera-orbit="auto auto 12m"
           environment-image="neutral"
           exposure="0.8"
         >
@@ -277,7 +277,7 @@ export default function ARViewer({ selectedTopic }) {
           <p className="text-white/50 text-sm font-heading">Zoom</p>
           <p className="text-purple-300 text-sm font-mono font-bold">{(scale * 100).toFixed(0)}%</p>
         </div>
-        <input type="range" min={0.3} max={1.5} step={0.05} value={scale}
+        <input type="range" min={0.05} max={1} step={0.02} value={scale}
           onChange={(e) => setScale(Number(e.target.value))} className="w-full accent-purple-500" />
         <div className="flex justify-between text-xs text-white/30 mt-1">
           <span>Zoom Out</span>
