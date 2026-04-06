@@ -399,6 +399,7 @@ export default function ARViewer({ selectedTopic }) {
   const [sweepAngle, setSweepAngle] = useState(0.01)
   const [animating, setAnimating] = useState(false)
   const [canvasKey, setCanvasKey] = useState(0)
+  const [arScale, setArScale] = useState(1)
 
   const handleAnimate = useCallback(() => {
     setSweepAngle(0.01)
@@ -420,6 +421,7 @@ export default function ARViewer({ selectedTopic }) {
     setSweepAngle(0.01)
     setAnimating(false)
     setCanvasKey((k) => k + 1)
+    setArScale(1)
   }, [])
 
   if (!model) return null
@@ -449,7 +451,8 @@ export default function ARViewer({ selectedTopic }) {
             shadow-intensity="1"
             ar-placement="floor"
             style={{ width: '100%', height: '400px', background: 'transparent' }}
-            ar-scale="fixed"
+            ar-scale="auto"
+            scale={`${arScale} ${arScale} ${arScale}`}
             camera-orbit={`45deg 55deg ${(8 - scale * 6).toFixed(2)}m`}
             min-camera-orbit="auto auto 0.5m"
             max-camera-orbit="auto auto 12m"
@@ -467,10 +470,25 @@ export default function ARViewer({ selectedTopic }) {
           ar
           ar-modes="webxr scene-viewer quick-look"
           ar-placement="floor"
-          ar-scale="fixed"
+          ar-scale="auto"
+          scale={`${arScale} ${arScale} ${arScale}`}
           style={{ display: 'none' }}
         />
       )}
+
+      {/* AR Size slider */}
+      <div className="glass p-4 rounded-2xl">
+        <div className="flex justify-between mb-2">
+          <p className="text-white/50 text-sm font-heading">AR Size</p>
+          <p className="text-purple-300 text-sm font-mono font-bold">{(arScale * 100).toFixed(0)}%</p>
+        </div>
+        <input type="range" min={0.5} max={3} step={0.1} value={arScale}
+          onChange={(e) => setArScale(Number(e.target.value))} className="w-full accent-purple-500" />
+        <div className="flex justify-between text-xs text-white/30 mt-1">
+          <span>Small</span>
+          <span>Large</span>
+        </div>
+      </div>
 
       {/* Buttons */}
       <div className="grid grid-cols-3 gap-3">
@@ -478,6 +496,7 @@ export default function ARViewer({ selectedTopic }) {
           onClick={() => {
             const mv = document.getElementById('ar-model-viewer')
             if (mv && mv.canActivateAR) {
+              mv.setAttribute('scale', `${arScale} ${arScale} ${arScale}`)
               mv.activateAR()
             } else {
               alert('AR is available on mobile devices only. Open this page on your phone to use AR.')
@@ -525,6 +544,7 @@ export default function ARViewer({ selectedTopic }) {
               mv.setAttribute('camera-orbit', '45deg 55deg 7.1m')
               mv.setAttribute('auto-rotate', '')
               setScale(0.15)
+              setArScale(1)
             }
           }}
           className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary"
