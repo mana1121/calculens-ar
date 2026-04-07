@@ -15,7 +15,7 @@ const AR_MODELS = {
     isRevolution: true,
     fn: (x) => x * x,
     bounds: [0, 2],
-    color: '#667eea',
+    color: '#1565C0',
     realWorld: {
       problem: 'A satellite dish is shaped like a paraboloid formed by rotating y = x² about the x-axis from x = 0 to x = 2 meters. Calculate the volume of material needed to manufacture the dish.',
       context: '🛰️ Satellite Dish Manufacturing',
@@ -36,7 +36,7 @@ const AR_MODELS = {
     isRevolution: true,
     fn: (x) => x,
     bounds: [0, 3],
-    color: '#a78bfa',
+    color: '#42A5F5',
     realWorld: {
       problem: 'A conical water tank has a height of 3 meters and a radius equal to its height. If the tank is completely full, what is the total volume of water it holds?',
       context: '🏗️ Water Tank Design',
@@ -309,7 +309,7 @@ function RevolutionSolid({ fn, bounds, sweepAngle, color }) {
         />
       </mesh>
       <mesh geometry={geo}>
-        <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.1} side={THREE.DoubleSide} />
+        <meshBasicMaterial color="#1565C0" wireframe transparent opacity={0.15} side={THREE.DoubleSide} />
       </mesh>
     </group>
   )
@@ -331,13 +331,13 @@ function Axes3D({ size = 3 }) {
           <group key={label}>
             <mesh>
               <tubeGeometry args={[path, 1, 0.025, 8, false]} />
-              <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} transparent opacity={0.9} />
+              <meshStandardMaterial color="#0D1B2A" emissive="#0D1B2A" emissiveIntensity={0.2} transparent opacity={0.9} />
             </mesh>
             <mesh position={end} rotation={dir[0] === 1 ? [0, 0, -Math.PI / 2] : dir[2] === 1 ? [Math.PI / 2, 0, 0] : [0, 0, 0]}>
               <coneGeometry args={[0.06, 0.2, 8]} />
-              <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+              <meshStandardMaterial color="#0D1B2A" emissive="#0D1B2A" emissiveIntensity={0.2} />
             </mesh>
-            <Text position={end.map((e) => e * 1.12)} fontSize={0.3} color="#ffffff" anchorX="center" anchorY="middle" font={undefined} fontWeight="bold">
+            <Text position={end.map((e) => e * 1.12)} fontSize={0.3} color="#0D1B2A" anchorX="center" anchorY="middle" font={undefined} fontWeight="bold">
               {label}
             </Text>
           </group>
@@ -345,7 +345,7 @@ function Axes3D({ size = 3 }) {
       })}
       <mesh position={[0, 0, 0]}>
         <sphereGeometry args={[0.04, 12, 12]} />
-        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={1} />
+        <meshStandardMaterial color="#1565C0" emissive="#1565C0" emissiveIntensity={0.5} />
       </mesh>
     </group>
   )
@@ -391,12 +391,12 @@ function RevolutionScene({ model, sweepAngle }) {
 
   return (
     <>
-      <color attach="background" args={['#080812']} />
-      <fog attach="fog" args={['#080812', 12, 30]} />
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 8, 5]} intensity={1.5} color="#ffffff" />
-      <directionalLight position={[-5, 3, -5]} intensity={0.5} color="#667eea" />
-      <pointLight position={[0, -3, 0]} intensity={0.3} color="#764ba2" />
+      <color attach="background" args={['#FFFFFF']} />
+      <fog attach="fog" args={['#FFFFFF', 12, 30]} />
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[5, 8, 5]} intensity={1.2} color="#ffffff" />
+      <directionalLight position={[-5, 3, -5]} intensity={0.4} color="#42A5F5" />
+      <pointLight position={[0, -3, 0]} intensity={0.3} color="#1565C0" />
 
       <Axes3D size={Math.max(b, maxY, 3)} />
 
@@ -469,7 +469,7 @@ export default function ARViewer({ selectedTopic }) {
       {/* 3D Preview — Canvas for revolution animation */}
       {isRevolution && (
         <div className="glass rounded-2xl overflow-hidden" style={{ minHeight: 350 }}>
-          <div style={{ width: '100%', height: 350, background: '#080812' }}>
+          <div style={{ width: '100%', height: 350, background: '#FFFFFF' }}>
             <Canvas key={canvasKey} camera={{ position: [5, 3, 5], fov: 40 }} dpr={[1, 2]}>
               <RevolutionScene model={model} sweepAngle={sweepAngle} />
             </Canvas>
@@ -520,7 +520,7 @@ export default function ARViewer({ selectedTopic }) {
             }
           }}
           className={`py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 ${!arReady ? 'opacity-60' : ''}`}
-          style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', boxShadow: '0 0 24px rgba(102,126,234,0.4)' }}
+          style={{ background: '#1565C0', boxShadow: '0 4px 16px rgba(21,101,192,0.25)' }}
         >
           {arReady ? '🔮 View in AR' : '⏳ Loading...'}
         </button>
@@ -529,7 +529,7 @@ export default function ARViewer({ selectedTopic }) {
           <button
             onClick={handleAnimate}
             disabled={animating}
-            className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary disabled:opacity-50"
+            className="py-4 rounded-2xl text-base font-heading font-bold flex items-center justify-center gap-2 btn-secondary disabled:opacity-50"
           >
             {animating ? '⟳ Revolving...' : '▶ Animate'}
           </button>
@@ -548,7 +548,7 @@ export default function ARViewer({ selectedTopic }) {
                 }
               }
             }}
-            className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary"
+            className="py-4 rounded-2xl text-base font-heading font-bold flex items-center justify-center gap-2 btn-secondary"
           >
             ▶ Play / Pause
           </button>
@@ -563,7 +563,7 @@ export default function ARViewer({ selectedTopic }) {
               setScale(0.15)
             }
           }}
-          className="py-4 rounded-2xl text-base font-heading font-bold text-white flex items-center justify-center gap-2 btn-secondary"
+          className="py-4 rounded-2xl text-base font-heading font-bold flex items-center justify-center gap-2 btn-secondary"
         >
           ↩ Reset
         </button>
@@ -573,20 +573,20 @@ export default function ARViewer({ selectedTopic }) {
       {isRevolution && (
         <div className="glass p-4 rounded-2xl">
           <div className="flex justify-between mb-2">
-            <p className="text-white/50 text-sm font-heading">Rotation Angle</p>
-            <p className="text-purple-300 text-sm font-mono font-bold">{((sweepAngle / (Math.PI * 2)) * 360).toFixed(0)}°</p>
+            <p className="text-[#64748B] text-sm font-heading">Rotation Angle</p>
+            <p className="text-[#1565C0] text-sm font-mono font-bold">{((sweepAngle / (Math.PI * 2)) * 360).toFixed(0)}°</p>
           </div>
-          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#E3F2FD' }}>
             <div className="h-full rounded-full transition-all duration-100"
-              style={{ width: `${(sweepAngle / (Math.PI * 2)) * 100}%`, background: `linear-gradient(90deg, ${model.color}, #a78bfa)` }} />
+              style={{ width: `${(sweepAngle / (Math.PI * 2)) * 100}%`, background: `linear-gradient(90deg, ${model.color}, #42A5F5)` }} />
           </div>
         </div>
       )}
 
       {/* Formula */}
       <div className="glass p-4 rounded-2xl">
-        <h3 className="font-heading font-bold text-white text-lg mb-1">{model.title}</h3>
-        <p className="text-white/50 text-sm mb-3">{model.description}</p>
+        <h3 className="font-heading font-bold text-[#0D1B2A] text-lg mb-1">{model.title}</h3>
+        <p className="text-[#64748B] text-sm mb-3">{model.description}</p>
         <BlockMathDisplay math={model.formula} />
       </div>
 
@@ -598,8 +598,8 @@ export default function ARViewer({ selectedTopic }) {
             onClick={() => setShowProblem((s) => !s)}
             className="w-full py-4 rounded-2xl text-base font-heading font-semibold border flex items-center justify-center gap-2 transition-all"
             style={showProblem
-              ? { background: 'rgba(245,158,11,0.15)', borderColor: 'rgba(245,158,11,0.5)', color: '#fff' }
-              : { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.7)' }
+              ? { background: 'rgba(245,158,11,0.15)', borderColor: '#f59e0b', color: '#0D1B2A' }
+              : { background: '#F0F7FF', borderColor: '#BBDEFB', color: '#1565C0' }
             }
           >
             <span className="text-xl">🌍</span>
@@ -615,11 +615,11 @@ export default function ARViewer({ selectedTopic }) {
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden space-y-3"
               >
-                <div className="glass p-4 rounded-2xl border border-amber-500/20" style={{ background: 'rgba(245,158,11,0.06)' }}>
-                  <p className="text-amber-400 text-xs font-heading font-bold uppercase tracking-wider mb-2">
+                <div className="p-4 rounded-2xl" style={{ background: '#FFF7E6', border: '1px solid #F59E0B' }}>
+                  <p className="text-[#B45309] text-xs font-heading font-bold uppercase tracking-wider mb-2">
                     {model.realWorld.context}
                   </p>
-                  <p className="text-white text-sm leading-relaxed">
+                  <p className="text-[#0D1B2A] text-sm leading-relaxed">
                     {model.realWorld.problem}
                   </p>
                 </div>
@@ -627,7 +627,7 @@ export default function ARViewer({ selectedTopic }) {
                 <motion.button
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setShowSolution((s) => !s)}
-                  className="w-full py-3 rounded-xl text-sm font-heading font-semibold border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                  className="w-full py-3 rounded-xl text-sm font-heading font-semibold border border-emerald-500 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
                 >
                   {showSolution ? '▲ Hide Solution' : '▼ Show Step-by-Step Solution'}
                 </motion.button>
@@ -650,12 +650,12 @@ export default function ARViewer({ selectedTopic }) {
                           className="glass p-4 rounded-2xl"
                         >
                           <div className="flex items-start gap-3">
-                            <div className="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-bold font-heading"
-                              style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)' }}>
+                            <div className="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-bold font-heading text-white"
+                              style={{ background: '#1565C0' }}>
                               {i + 1}
                             </div>
                             <div className="flex-1">
-                              <p className="text-white/70 text-sm mb-2">{step.step}</p>
+                              <p className="text-[#0D1B2A] text-sm mb-2">{step.step}</p>
                               <BlockMathDisplay math={step.math} />
                             </div>
                           </div>
@@ -671,9 +671,9 @@ export default function ARViewer({ selectedTopic }) {
       )}
 
       {/* AR Instructions */}
-      <div className="glass-dark p-4 rounded-2xl border border-purple-500/20">
-        <p className="text-purple-300 text-xs font-heading font-semibold mb-2">📱 How to use AR:</p>
-        <ul className="text-white/50 text-xs space-y-1">
+      <div className="p-4 rounded-2xl" style={{ background: '#F0F7FF', border: '1px solid #BBDEFB' }}>
+        <p className="text-[#1565C0] text-xs font-heading font-semibold mb-2">📱 How to use AR:</p>
+        <ul className="text-[#64748B] text-xs space-y-1">
           <li>• Android: Tap "View in AR" → Google Scene Viewer</li>
           <li>• iOS: Tap "View in AR" → AR Quick Look</li>
           <li>• Desktop: Rotate and zoom the model above</li>

@@ -24,14 +24,14 @@ export default function SolutionDisplay({ imageDataURL, result, onReset, onVisua
           />
         )}
         <div>
-          <p className="text-white/40 text-xs font-mono mb-1">Detected question</p>
-          <p className="text-white/80 text-sm leading-relaxed">{question_text}</p>
+          <p className="text-[#1565C0] text-xs font-mono mb-1">Detected question</p>
+          <p className="text-[#0D1B2A] text-sm leading-relaxed">{question_text}</p>
         </div>
       </div>
 
       {/* Topic badge */}
       <div className="flex items-center gap-2">
-        <span className="px-3 py-1 glass rounded-full text-xs font-heading text-purple-300 border border-purple-500/30">
+        <span className="px-3 py-1 rounded-full text-xs font-heading text-[#1565C0]" style={{ background: '#E3F2FD', border: '1px solid #BBDEFB' }}>
           {topic?.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
         </span>
       </div>
@@ -48,13 +48,13 @@ export default function SolutionDisplay({ imageDataURL, result, onReset, onVisua
           >
             <div className="flex items-start gap-3">
               <div
-                className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold font-heading"
-                style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)' }}
+                className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold font-heading text-white"
+                style={{ background: '#1565C0' }}
               >
                 {step.step}
               </div>
               <div className="flex-1">
-                <p className="text-white/70 text-sm mb-2">{step.description}</p>
+                <p className="text-[#0D1B2A] text-sm mb-2">{step.description}</p>
                 {step.math && <BlockMathDisplay math={step.math} />}
               </div>
             </div>
@@ -68,10 +68,10 @@ export default function SolutionDisplay({ imageDataURL, result, onReset, onVisua
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: (solution.steps?.length || 0) * 0.1 }}
-          className="glass p-5 rounded-2xl border border-purple-500/30"
-          style={{ background: 'rgba(102,126,234,0.08)' }}
+          className="p-5 rounded-2xl"
+          style={{ background: '#E3F2FD', border: '2px solid #1565C0' }}
         >
-          <p className="text-white/50 text-xs font-mono mb-2">✅ Final Answer</p>
+          <p className="text-[#1565C0] text-xs font-mono mb-2 font-bold">✅ Final Answer</p>
           <BlockMathDisplay math={solution.final_answer} />
         </motion.div>
       )}

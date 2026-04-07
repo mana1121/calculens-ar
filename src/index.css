@@ -14,14 +14,15 @@
   }
 
   body {
-    background: #0d0d1a;
-    color: #ffffff;
+    background: #FFFFFF;
+    color: #0D1B2A;
     font-family: system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', sans-serif;
+    color: #0D1B2A;
   }
 
   code, .math {
@@ -31,24 +32,26 @@
 
 @layer components {
   .glass {
-    background: rgba(255, 255, 255, 0.05);
+    background: #F0F7FF;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid #90CAF9;
     border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(21, 101, 192, 0.08);
   }
 
   .glass-dark {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(240, 247, 255, 0.92);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid #90CAF9;
     border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(21, 101, 192, 0.08);
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: #1565C0;
+    color: #FFFFFF;
     padding: 12px 24px;
     border-radius: 12px;
     font-weight: 600;
@@ -56,12 +59,12 @@
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 2px 12px rgba(21, 101, 192, 0.20);
   }
 
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 4px 16px rgba(21, 101, 192, 0.25);
   }
 
   .btn-primary:active {
@@ -69,42 +72,43 @@
   }
 
   .btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: #FFFFFF;
+    color: #1565C0;
     padding: 12px 24px;
     border-radius: 12px;
     font-weight: 600;
     font-family: 'Space Grotesk', sans-serif;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1.5px solid #1565C0;
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: #E3F2FD;
     transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(21, 101, 192, 0.14);
   }
 
   .glow-text {
-    text-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+    text-shadow: 0 0 20px rgba(21, 101, 192, 0.30);
   }
 }
 
 /* model-viewer AR button — keep visible on mobile */
 model-viewer::part(default-ar-button) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #1565C0;
+  color: #FFFFFF;
   border: none;
   border-radius: 12px;
   padding: 12px 24px;
   font-weight: 700;
   font-family: 'Space Grotesk', sans-serif;
-  box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 16px rgba(21, 101, 192, 0.20);
 }
 
 .ar-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #1565C0;
+  color: #FFFFFF;
   border: none;
   padding: 14px 28px;
   border-radius: 12px;
@@ -112,14 +116,14 @@ model-viewer::part(default-ar-button) {
   font-size: 16px;
   font-family: 'Space Grotesk', sans-serif;
   cursor: pointer;
-  box-shadow: 0 0 24px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 4px 16px rgba(21, 101, 192, 0.25);
   margin-top: 16px;
 }
 
 /* KaTeX overrides */
 .katex {
   font-size: 1.1em;
-  color: #e0d7ff;
+  color: #0D1B2A;
 }
 
 .katex-display {
@@ -131,9 +135,12 @@ model-viewer::part(default-ar-button) {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #F0F7FF;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(102, 126, 234, 0.4);
+  background: #90CAF9;
   border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1565C0;
 }

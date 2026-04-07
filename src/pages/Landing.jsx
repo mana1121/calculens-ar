@@ -16,11 +16,11 @@ export default function Landing() {
       <TopicGrid />
 
       {/* Footer */}
-      <footer className="text-center py-12 px-6 border-t border-white/5">
-        <p className="text-white/30 text-sm font-heading">
+      <footer className="text-center py-12 px-6 border-t border-[#BBDEFB]" style={{ background: '#F0F7FF' }}>
+        <p className="text-[#1565C0] text-sm font-heading">
           CalcuLens AR · See the Math. Feel the Change.
         </p>
-        <p className="text-white/20 text-xs mt-1">
+        <p className="text-[#64748B] text-xs mt-1">
           Built with AI & Augmented Reality
         </p>
       </footer>

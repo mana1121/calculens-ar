@@ -88,7 +88,7 @@ export default function VisualizePage() {
   if (!config) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-white/50">Topic not found.</p>
+        <p className="text-[#64748B]">Topic not found.</p>
       </div>
     )
   }
@@ -114,8 +114,8 @@ export default function VisualizePage() {
           onClick={() => setShowQuestions((s) => !s)}
           className="w-full mt-6 py-4 rounded-2xl text-base font-heading font-semibold border transition-all flex items-center justify-center gap-2"
           style={showQuestions
-            ? { background: 'rgba(102,126,234,0.15)', borderColor: 'rgba(102,126,234,0.5)', color: '#fff' }
-            : { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.7)' }
+            ? { background: '#E3F2FD', borderColor: '#1565C0', borderWidth: '2px', color: '#1565C0' }
+            : { background: '#F0F7FF', borderColor: '#BBDEFB', borderWidth: '1px', color: '#1565C0' }
           }
         >
           <span className="text-xl">📝</span>
@@ -143,16 +143,16 @@ export default function VisualizePage() {
                   {/* Question */}
                   <button
                     onClick={() => setExpandedQ(expandedQ === i ? null : i)}
-                    className="w-full p-5 text-left flex items-start gap-4 hover:bg-white/[0.02] transition-colors"
+                    className="w-full p-5 text-left flex items-start gap-4 hover:bg-[#E3F2FD]/40 transition-colors"
                   >
                     <div
-                      className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold font-heading"
-                      style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)' }}
+                      className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold font-heading text-white"
+                      style={{ background: '#1565C0' }}
                     >
                       {i + 1}
                     </div>
                     <div className="flex-1">
-                      <p className="text-white text-sm leading-relaxed">{item.q}</p>
+                      <p className="text-[#0D1B2A] text-sm leading-relaxed">{item.q}</p>
                       <div className="flex items-center gap-2 mt-2">
                         <span
                           className="text-[10px] font-heading font-bold uppercase px-2 py-0.5 rounded-full"
@@ -160,7 +160,7 @@ export default function VisualizePage() {
                         >
                           {item.difficulty}
                         </span>
-                        <span className="text-white/30 text-xs">
+                        <span className="text-[#64748B] text-xs">
                           {expandedQ === i ? '▲ Hide solution' : '▼ Show solution'}
                         </span>
                       </div>
@@ -177,9 +177,9 @@ export default function VisualizePage() {
                         transition={{ duration: 0.25 }}
                         className="overflow-hidden"
                       >
-                        <div className="px-5 pb-5 pt-0 border-t border-white/5">
-                          <div className="mt-4 p-4 rounded-xl" style={{ background: 'rgba(102,126,234,0.08)' }}>
-                            <p className="text-white/40 text-xs font-mono mb-2">Solution</p>
+                        <div className="px-5 pb-5 pt-0 border-t border-[#BBDEFB]">
+                          <div className="mt-4 p-4 rounded-xl" style={{ background: '#E3F2FD' }}>
+                            <p className="text-[#1565C0] text-xs font-mono mb-2">Solution</p>
                             <BlockMathDisplay math={item.math} />
                           </div>
                         </div>

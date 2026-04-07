@@ -8,7 +8,7 @@ const topics = [
     title: 'Limits',
     subtitle: 'Calculus I',
     desc: 'Explore left/right limits and continuity',
-    color: '#667eea',
+    color: '#1565C0',
   },
   {
     id: 'derivatives',
@@ -16,7 +16,7 @@ const topics = [
     title: 'Derivatives',
     subtitle: 'Calculus I',
     desc: 'Tangent lines and rate of change',
-    color: '#a78bfa',
+    color: '#42A5F5',
   },
   {
     id: 'integration',
@@ -62,10 +62,10 @@ export default function TopicGrid() {
         transition={{ duration: 0.6 }}
         className="text-center mb-12"
       >
-        <h2 className="font-heading font-bold text-3xl md:text-4xl text-white mb-4">
+        <h2 className="font-heading font-bold text-3xl md:text-4xl text-[#0D1B2A] mb-4">
           Calculus Topics
         </h2>
-        <p className="text-white/50 text-lg max-w-xl mx-auto">
+        <p className="text-[#64748B] text-lg max-w-xl mx-auto">
           All major calculus topics covered with interactive 3D visualizations
         </p>
       </motion.div>
@@ -93,13 +93,13 @@ export default function TopicGrid() {
                   >
                     {topic.icon}
                   </div>
-                  <span className="text-[10px] font-mono text-white/30 bg-white/5 px-2 py-1 rounded-full">
+                  <span className="text-[10px] font-mono text-[#1565C0] px-2 py-1 rounded-full" style={{ background: '#E3F2FD', border: '1px solid #BBDEFB' }}>
                     {topic.subtitle}
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-heading font-semibold text-white text-sm">{topic.title}</h3>
-                  <p className="text-white/50 text-xs leading-relaxed mt-1">{topic.desc}</p>
+                  <h3 className="font-heading font-semibold text-[#0D1B2A] text-sm">{topic.title}</h3>
+                  <p className="text-[#64748B] text-xs leading-relaxed mt-1">{topic.desc}</p>
                 </div>
                 <div
                   className="text-xs font-heading font-semibold opacity-0 group-hover:opacity-100 transition-opacity"

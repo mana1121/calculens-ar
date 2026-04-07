@@ -82,7 +82,7 @@ export default function Chat() {
       {/* Header */}
       <div
         className="px-4 pt-4 pb-3"
-        style={{ background: 'linear-gradient(180deg, rgba(102,126,234,0.15) 0%, transparent 100%)' }}
+        style={{ background: 'linear-gradient(180deg, #E3F2FD 0%, #FFFFFF 100%)' }}
       >
         <PageHeader title="Ask CalcuLens" subtitle="AI Calculus Tutor" />
       </div>
@@ -105,7 +105,7 @@ export default function Chat() {
                 key={s}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => sendMessage(s)}
-                className="flex-shrink-0 px-3 py-2 glass rounded-xl text-xs text-white/60 border border-white/10 hover:border-purple-500/30 hover:text-white/80 transition-colors"
+                className="flex-shrink-0 px-3 py-2 glass rounded-xl text-xs text-[#64748B] border border-[#BBDEFB] hover:border-[#1565C0] hover:text-[#1565C0] transition-colors"
               >
                 {s}
               </motion.button>
@@ -116,7 +116,7 @@ export default function Chat() {
 
       {/* Input */}
       <div className="px-4 pb-24 md:pb-4 pt-2">
-        <div className="glass flex items-end gap-3 p-3 rounded-2xl border border-white/10">
+        <div className="glass flex items-end gap-3 p-3 rounded-2xl">
           <textarea
             ref={inputRef}
             value={input}
@@ -129,7 +129,7 @@ export default function Chat() {
             }}
             placeholder="Ask a calculus question... (Enter to send)"
             rows={1}
-            className="flex-1 bg-transparent text-white text-sm outline-none resize-none placeholder-white/30 max-h-32"
+            className="flex-1 bg-transparent text-[#0D1B2A] text-sm outline-none resize-none placeholder-[#90CAF9] max-h-32"
             style={{ lineHeight: '1.5' }}
           />
           <motion.button
@@ -137,7 +137,7 @@ export default function Chat() {
             onClick={() => sendMessage(input)}
             disabled={!input.trim() || loading}
             className="w-10 h-10 rounded-xl flex items-center justify-center text-white disabled:opacity-40 flex-shrink-0 transition-opacity"
-            style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)' }}
+            style={{ background: '#1565C0', boxShadow: '0 2px 12px rgba(21,101,192,0.20)' }}
           >
             ↑
           </motion.button>

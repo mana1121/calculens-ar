@@ -68,9 +68,9 @@ export default function CameraView({ onCapture }) {
         />
 
         {!cameraActive && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/60">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4" style={{ background: 'rgba(240,247,255,0.92)' }}>
             <div className="text-5xl">📸</div>
-            <p className="font-heading text-white/70 text-sm text-center px-6">
+            <p className="font-heading text-[#0D1B2A] text-sm text-center px-6">
               Point at your calculus question and snap!
             </p>
             <motion.button
@@ -86,13 +86,13 @@ export default function CameraView({ onCapture }) {
         {cameraActive && (
           <>
             {/* Guide overlay */}
-            <div className="absolute inset-4 border-2 border-white/30 rounded-xl pointer-events-none">
+            <div className="absolute inset-4 border-2 border-white/60 rounded-xl pointer-events-none">
               <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-white rounded-tl-lg" />
               <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-white rounded-tr-lg" />
               <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-white rounded-bl-lg" />
               <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-white rounded-br-lg" />
             </div>
-            <p className="absolute top-6 left-0 right-0 text-center text-white/60 text-xs font-heading pointer-events-none">
+            <p className="absolute top-6 left-0 right-0 text-center text-white/90 text-xs font-heading pointer-events-none" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
               Align question within frame
             </p>
           </>
@@ -112,8 +112,8 @@ export default function CameraView({ onCapture }) {
       </div>
 
       {error && (
-        <div className="glass p-3 rounded-xl mb-4 border border-red-500/30">
-          <p className="text-red-400 text-sm text-center">{error}</p>
+        <div className="p-3 rounded-xl mb-4" style={{ background: '#FEF2F2', border: '1px solid #FCA5A5' }}>
+          <p className="text-red-600 text-sm text-center">{error}</p>
         </div>
       )}
 
@@ -132,7 +132,7 @@ export default function CameraView({ onCapture }) {
               whileTap={{ scale: 0.9 }}
               onClick={capturePhoto}
               className="w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-glow-lg"
-              style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)' }}
+              style={{ background: '#1565C0' }}
             >
               📷
             </motion.button>

@@ -70,8 +70,8 @@ export default function DerivativesModule() {
     }
 
     // f(x) curve — thick glow
-    ctx.strokeStyle = '#667eea'; ctx.lineWidth = 3.5
-    ctx.shadowColor = '#667eea'; ctx.shadowBlur = 10
+    ctx.strokeStyle = '#1565C0'; ctx.lineWidth = 3.5
+    ctx.shadowColor = '#1565C0'; ctx.shadowBlur = 10
     ctx.beginPath()
     let started = false
     for (let i = 0; i <= 500; i++) {
@@ -102,40 +102,40 @@ export default function DerivativesModule() {
     ctx.beginPath(); ctx.arc(pcx, pcy, 8, 0, Math.PI * 2)
     ctx.fillStyle = '#f59e0b'; ctx.fill()
     ctx.shadowBlur = 0
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke()
+    ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2.5; ctx.stroke()
 
     // Slope label near point
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 13px monospace'
+    ctx.fillStyle = '#0D1B2A'; ctx.font = 'bold 13px monospace'
     ctx.fillText(`m = ${slope.toFixed(2)}`, pcx + 16, pcy - 16)
   }, [presetIdx, pointX, showDeriv, preset, domain, slope, fy])
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-2xl overflow-hidden border border-white/5"
-        style={{ background: 'radial-gradient(ellipse at 40% 40%, rgba(102,126,234,0.08) 0%, #080812 70%)' }}>
+      <div className="rounded-2xl overflow-hidden border border-[#BBDEFB]"
+        style={{ background: '#FFFFFF', boxShadow: '0 2px 12px rgba(21,101,192,0.08)' }}>
         <canvas ref={canvasRef} width={W} height={H} className="w-full" style={{ maxHeight: 500 }} />
       </div>
 
       {/* Slope display */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="glass p-4 rounded-2xl" style={{ background: 'rgba(102,126,234,0.06)' }}>
+        <div className="glass p-4 rounded-2xl" style={{ background: '#E3F2FD' }}>
           <BlockMathDisplay math={preset.derivLatex} />
         </div>
         <div className="glass p-4 rounded-2xl flex flex-col items-end justify-center">
-          <p className="text-white/40 text-xs font-mono">Slope at x = {pointX.toFixed(2)}</p>
-          <p className="font-heading font-bold text-3xl text-amber-400">{slope.toFixed(3)}</p>
-          <p className="text-white/30 text-xs font-mono">f({pointX.toFixed(2)}) = {fy.toFixed(3)}</p>
+          <p className="text-[#64748B] text-xs font-mono">Slope at x = {pointX.toFixed(2)}</p>
+          <p className="font-heading font-bold text-3xl text-amber-500">{slope.toFixed(3)}</p>
+          <p className="text-[#64748B] text-xs font-mono">f({pointX.toFixed(2)}) = {fy.toFixed(3)}</p>
         </div>
       </div>
 
       {/* Slider */}
       <div className="glass p-4 rounded-2xl">
         <div className="flex justify-between mb-2">
-          <p className="text-white/50 text-sm font-heading">Move point along curve</p>
-          <p className="text-amber-400 text-sm font-mono font-bold">x = {pointX.toFixed(2)}</p>
+          <p className="text-[#64748B] text-sm font-heading">Move point along curve</p>
+          <p className="text-amber-500 text-sm font-mono font-bold">x = {pointX.toFixed(2)}</p>
         </div>
         <input type="range" min={domain[0] + 0.15} max={domain[1] - 0.15} step={0.02} value={pointX}
-          onChange={(e) => { setSweeping(false); setPointX(Number(e.target.value)) }} className="w-full accent-amber-500" />
+          onChange={(e) => { setSweeping(false); setPointX(Number(e.target.value)) }} className="w-full" style={{ accentColor: '#f59e0b' }} />
       </div>
 
       {/* Controls */}
@@ -155,7 +155,7 @@ export default function DerivativesModule() {
           <motion.button key={i} whileTap={{ scale: 0.95 }}
             onClick={() => { setPresetIdx(i); setPointX(0); setSweeping(false) }}
             className={`flex-1 py-3 rounded-xl text-sm font-mono border transition-all ${
-              presetIdx === i ? 'border-purple-500/50 bg-purple-500/20 text-white' : 'border-white/10 text-white/50'
+              presetIdx === i ? 'border-2 border-[#1565C0] bg-[#E3F2FD] text-[#1565C0]' : 'border-[#BBDEFB] bg-[#F0F7FF] text-[#64748B]'
             }`}>
             {p.label}
           </motion.button>

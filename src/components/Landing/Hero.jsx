@@ -18,11 +18,11 @@ function ParametricTorus() {
     <mesh ref={meshRef}>
       <torusKnotGeometry args={[1, 0.3, 128, 32]} />
       <meshStandardMaterial
-        color="#667eea"
+        color="#1565C0"
         wireframe={false}
         metalness={0.6}
         roughness={0.2}
-        emissive="#764ba2"
+        emissive="#42A5F5"
         emissiveIntensity={0.3}
       />
     </mesh>
@@ -50,7 +50,7 @@ function FloatingParticles() {
 
   return (
     <points ref={pointsRef} geometry={geo}>
-      <pointsMaterial color="#a78bfa" size={0.05} transparent opacity={0.6} />
+      <pointsMaterial color="#BBDEFB" size={0.05} transparent opacity={0.4} />
     </points>
   )
 }
@@ -61,15 +61,15 @@ export default function Hero() {
       {/* Gradient background */}
       <div
         className="absolute inset-0"
-        style={{ background: 'linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0d1a2e 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #FFFFFF 60%, #E3F2FD 100%)' }}
       />
 
       {/* 3D Canvas */}
-      <div className="absolute inset-0 opacity-70">
+      <div className="absolute inset-0 opacity-50">
         <Canvas camera={{ position: [0, 0, 4], fov: 60 }}>
-          <ambientLight intensity={0.5} />
-          <pointLight position={[5, 5, 5]} intensity={1} color="#667eea" />
-          <pointLight position={[-5, -5, -5]} intensity={0.5} color="#764ba2" />
+          <ambientLight intensity={0.7} />
+          <pointLight position={[5, 5, 5]} intensity={1} color="#1565C0" />
+          <pointLight position={[-5, -5, -5]} intensity={0.5} color="#42A5F5" />
           <ParametricTorus />
           <FloatingParticles />
           <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.5} />
@@ -83,21 +83,21 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          <div className="inline-flex items-center gap-2 px-5 py-3 glass rounded-full text-base text-white font-heading mb-8">
+          <div className="inline-flex items-center gap-2 px-5 py-3 glass rounded-full text-base text-[#1565C0] font-heading mb-8">
             <span>🎓</span>
             <span>Interactive Calculus Learning Platform</span>
           </div>
 
-          <h1 className="font-heading font-bold text-6xl md:text-8xl text-white mb-6 leading-tight drop-shadow-lg">
-            Calcu<span style={{ background: 'linear-gradient(135deg, #667eea, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Lens</span>{' '}
-            <span className="text-white">AR</span>
+          <h1 className="font-heading font-bold text-6xl md:text-8xl text-[#0D1B2A] mb-6 leading-tight drop-shadow-lg">
+            Calcu<span style={{ color: '#42A5F5' }}>Lens</span>{' '}
+            <span className="text-[#0D1B2A]">AR</span>
           </h1>
 
-          <p className="font-heading text-2xl md:text-3xl text-white mb-8 glow-text font-semibold">
+          <p className="font-heading text-2xl md:text-3xl text-[#1565C0] mb-8 glow-text font-semibold">
             See the Math. Feel the Change.
           </p>
 
-          <p className="text-white text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+          <p className="text-[#64748B] text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
             3D Interactive Calculus Visualization with AI & Augmented Reality for students everywhere
           </p>
         </motion.div>
@@ -123,7 +123,7 @@ export default function Hero() {
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/30 text-sm flex flex-col items-center gap-2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[#90CAF9] text-sm flex flex-col items-center gap-2"
         animate={{ y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       >

@@ -81,8 +81,8 @@ export default function RateOfChangeModule() {
       const cx = W / 2, cy = H / 2
       const r = Math.min(state.r * 25, 120)
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(102,126,234,0.2)'; ctx.fill()
-      ctx.strokeStyle = '#667eea'; ctx.lineWidth = 2; ctx.stroke()
+      ctx.fillStyle = 'rgba(21,101,192,0.20)'; ctx.fill()
+      ctx.strokeStyle = '#1565C0'; ctx.lineWidth = 2; ctx.stroke()
       ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3])
       ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + r, cy); ctx.stroke()
       ctx.setLineDash([])
@@ -108,7 +108,7 @@ export default function RateOfChangeModule() {
       const scale = 35
       const x = state.x * scale, y = state.y * scale
       // Wall
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 3
+      ctx.strokeStyle = '#0D1B2A'; ctx.lineWidth = 3
       ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox, oy - 200); ctx.stroke()
       ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox + 200, oy); ctx.stroke()
       // Ladder
@@ -118,7 +118,7 @@ export default function RateOfChangeModule() {
       ctx.beginPath(); ctx.arc(ox + x, oy, 6, 0, Math.PI * 2); ctx.fill()
       ctx.beginPath(); ctx.arc(ox, oy - y, 6, 0, Math.PI * 2); ctx.fill()
       // Labels
-      ctx.fillStyle = '#f59e0b80'; ctx.font = '10px monospace'
+      ctx.fillStyle = '#f59e0b'; ctx.font = '10px monospace'
       ctx.fillText(`x=${state.x.toFixed(1)}`, ox + x / 2, oy + 15)
       ctx.fillText(`y=${state.y.toFixed(1)}`, ox - 32, oy - y / 2)
     }
@@ -132,8 +132,8 @@ export default function RateOfChangeModule() {
         </div>
         <div className="flex-1 flex flex-col gap-3">
           {state.labels.map((lbl) => (
-            <div key={lbl} className="glass-dark p-3 rounded-xl">
-              <p className="font-mono text-sm text-purple-300">{lbl}</p>
+            <div key={lbl} className="p-3 rounded-xl" style={{ background: '#F0F7FF', border: '1px solid #BBDEFB' }}>
+              <p className="font-mono text-sm text-[#1565C0]">{lbl}</p>
             </div>
           ))}
         </div>
@@ -146,10 +146,10 @@ export default function RateOfChangeModule() {
       {/* Slider */}
       <div className="glass p-4 rounded-2xl">
         <div className="flex justify-between mb-2">
-          <p className="text-white/50 text-xs font-heading">Time</p>
-          <p className="text-purple-300 text-xs font-mono">t = {t.toFixed(2)}s</p>
+          <p className="text-[#64748B] text-xs font-heading">Time</p>
+          <p className="text-[#1565C0] text-xs font-mono">t = {t.toFixed(2)}s</p>
         </div>
-        <input type="range" min={0} max={3} step={0.01} value={t} onChange={(e) => { setPlaying(false); setT(Number(e.target.value)) }} className="w-full accent-purple-500" />
+        <input type="range" min={0} max={3} step={0.01} value={t} onChange={(e) => { setPlaying(false); setT(Number(e.target.value)) }} className="w-full" style={{ accentColor: '#1565C0' }} />
       </div>
 
       <div className="flex gap-3">
@@ -167,7 +167,7 @@ export default function RateOfChangeModule() {
             whileTap={{ scale: 0.95 }}
             onClick={() => { setScenarioIdx(i); setT(0); setPlaying(false) }}
             className={`flex-1 py-3 px-2 rounded-xl text-xs font-heading border transition-all ${
-              scenarioIdx === i ? 'border-purple-500/50 bg-purple-500/20 text-white' : 'border-white/10 text-white/50'
+              scenarioIdx === i ? 'border-2 border-[#1565C0] bg-[#E3F2FD] text-[#1565C0]' : 'border-[#BBDEFB] bg-[#F0F7FF] text-[#64748B]'
             }`}
           >
             {s.icon} {s.label}

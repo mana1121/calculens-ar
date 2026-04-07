@@ -8,19 +8,19 @@ export default {
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
-        primary: '#667eea',
-        secondary: '#764ba2',
+        primary: '#1565C0',
+        secondary: '#42A5F5',
       },
       backgroundImage: {
-        'gradient-main': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'gradient-main': 'linear-gradient(135deg, #1565C0 0%, #42A5F5 100%)',
       },
       borderRadius: {
         card: '16px',
         btn: '12px',
       },
       boxShadow: {
-        glow: '0 0 20px rgba(102, 126, 234, 0.4)',
-        'glow-lg': '0 0 40px rgba(102, 126, 234, 0.6)',
+        glow: '0 0 20px rgba(21, 101, 192, 0.20)',
+        'glow-lg': '0 0 40px rgba(21, 101, 192, 0.25)',
       },
     },
   },

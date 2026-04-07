@@ -5,7 +5,7 @@ export function InlineMathDisplay({ math }) {
   try {
     return <InlineMath math={math} />
   } catch {
-    return <span className="font-mono text-purple-300">{math}</span>
+    return <span className="font-mono text-[#1565C0]">{math}</span>
   }
 }
 
@@ -17,7 +17,7 @@ export function BlockMathDisplay({ math }) {
       </div>
     )
   } catch {
-    return <pre className="font-mono text-purple-300 text-sm">{math}</pre>
+    return <pre className="font-mono text-[#1565C0] text-sm">{math}</pre>
   }
 }
 

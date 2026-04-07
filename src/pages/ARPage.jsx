@@ -50,8 +50,8 @@ export default function ARPage() {
           {CATEGORIES.map((cat) => (
             <div key={cat.label}>
               <div className="mb-3">
-                <p className="font-heading font-semibold text-white text-sm">{cat.label}</p>
-                <p className="text-white/30 text-xs font-mono">{cat.subtitle}</p>
+                <p className="font-heading font-semibold text-[#0D1B2A] text-sm">{cat.label}</p>
+                <p className="text-[#64748B] text-xs font-mono">{cat.subtitle}</p>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {cat.keys.map((key) => {
@@ -64,12 +64,12 @@ export default function ARPage() {
                       onClick={() => setSelectedTopic(key)}
                       className={`p-3 rounded-xl text-left border transition-all ${
                         isActive
-                          ? 'border-purple-500/60 bg-purple-500/15'
-                          : 'border-white/10 glass hover:border-white/20'
+                          ? 'border-2 border-[#1565C0] bg-[#E3F2FD]'
+                          : 'border border-[#BBDEFB] bg-[#F0F7FF] hover:border-[#90CAF9]'
                       }`}
                     >
                       <div className="text-xl mb-1">{model.icon}</div>
-                      <p className={`text-xs font-heading font-medium leading-tight ${isActive ? 'text-purple-300' : 'text-white/60'}`}>
+                      <p className={`text-xs font-heading font-medium leading-tight ${isActive ? 'text-[#1565C0]' : 'text-[#64748B]'}`}>
                         {model.title.split(':').pop()?.trim() || model.title}
                       </p>
                     </motion.button>

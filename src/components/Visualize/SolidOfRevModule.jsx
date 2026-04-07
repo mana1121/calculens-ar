@@ -7,8 +7,8 @@ import { BlockMathDisplay } from '../Shared/MathDisplay.jsx'
 import { Link } from 'react-router-dom'
 
 const PRESETS = [
-  { label: 'y = x²', fn: (x) => x * x, fnStr: 'x^2', bounds: [0, 2], volume: '\\frac{32\\pi}{5} \\approx 20.11', color: '#667eea' },
-  { label: 'y = x', fn: (x) => x, fnStr: 'x', bounds: [0, 3], volume: '9\\pi \\approx 28.27', color: '#a78bfa' },
+  { label: 'y = x²', fn: (x) => x * x, fnStr: 'x^2', bounds: [0, 2], volume: '\\frac{32\\pi}{5} \\approx 20.11', color: '#1565C0' },
+  { label: 'y = x', fn: (x) => x, fnStr: 'x', bounds: [0, 3], volume: '9\\pi \\approx 28.27', color: '#42A5F5' },
   { label: 'y = √x', fn: (x) => Math.sqrt(Math.max(0, x)), fnStr: '\\sqrt{x}', bounds: [0, 4], volume: '8\\pi \\approx 25.13', color: '#34d399' },
   { label: 'y = sin(x)', fn: (x) => Math.sin(x), fnStr: '\\sin(x)', bounds: [0, Math.PI], volume: '\\frac{\\pi^2}{2} \\approx 4.93', color: '#f59e0b' },
   { label: 'y = 1/x', fn: (x) => 1 / x, fnStr: '\\frac{1}{x}', bounds: [1, 3], volume: '\\frac{2\\pi}{3} \\approx 2.09', color: '#f87171' },
@@ -97,14 +97,14 @@ function Solid({ fn, bounds, sweepAngle, color, wireframe }) {
       {/* Wireframe overlay */}
       {wireframe && (
         <mesh geometry={geo}>
-          <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.1} side={THREE.DoubleSide} />
+          <meshBasicMaterial color="#1565C0" wireframe transparent opacity={0.15} side={THREE.DoubleSide} />
         </mesh>
       )}
     </group>
   )
 }
 
-// 3D Axes — thick, fluorescent white, bold
+// 3D Axes — thick, dark, bold (visible on white)
 function Axes3D({ size = 4 }) {
   const axisData = [
     { dir: [1, 0, 0], label: 'X' },
@@ -112,7 +112,7 @@ function Axes3D({ size = 4 }) {
     { dir: [0, 0, 1], label: 'Z' },
   ]
 
-  const axisColor = '#ffffff'
+  const axisColor = '#0D1B2A'
 
   return (
     <group>
@@ -128,13 +128,13 @@ function Axes3D({ size = 4 }) {
             {/* Thick tube axis */}
             <mesh>
               <tubeGeometry args={[path, 1, 0.035, 8, false]} />
-              <meshStandardMaterial color={axisColor} emissive={axisColor} emissiveIntensity={0.8} transparent opacity={0.9} />
+              <meshStandardMaterial color={axisColor} emissive={axisColor} emissiveIntensity={0.1} transparent opacity={0.9} />
             </mesh>
             {/* Arrow cone at end */}
             <mesh position={end}
               rotation={dir[0] === 1 ? [0, 0, -Math.PI / 2] : dir[2] === 1 ? [Math.PI / 2, 0, 0] : [0, 0, 0]}>
               <coneGeometry args={[0.08, 0.25, 8]} />
-              <meshStandardMaterial color={axisColor} emissive={axisColor} emissiveIntensity={0.8} />
+              <meshStandardMaterial color={axisColor} emissive={axisColor} emissiveIntensity={0.1} />
             </mesh>
             {/* Label */}
             <Text
@@ -161,12 +161,12 @@ function Axes3D({ size = 4 }) {
                 <group key={val}>
                   <mesh>
                     <tubeGeometry args={[tickPath, 1, 0.02, 4, false]} />
-                    <meshStandardMaterial color={axisColor} emissive={axisColor} emissiveIntensity={0.5} transparent opacity={0.6} />
+                    <meshStandardMaterial color={axisColor} emissive={axisColor} emissiveIntensity={0.05} transparent opacity={0.7} />
                   </mesh>
                   <Text
                     position={[pos[0] + (dir[0] === 1 ? 0 : -0.2), pos[1] + (dir[1] === 1 ? 0 : -0.2), pos[2] + (dir[2] === 1 ? 0.2 : 0)]}
                     fontSize={0.2}
-                    color="rgba(255,255,255,0.6)"
+                    color="#64748B"
                     anchorX="center"
                     anchorY="top"
                     font={undefined}
@@ -182,9 +182,9 @@ function Axes3D({ size = 4 }) {
       {/* Origin */}
       <mesh position={[0, 0, 0]}>
         <sphereGeometry args={[0.06, 12, 12]} />
-        <meshStandardMaterial color={axisColor} emissive={axisColor} emissiveIntensity={1} />
+        <meshStandardMaterial color="#1565C0" emissive="#1565C0" emissiveIntensity={0.5} />
       </mesh>
-      <Text position={[-0.2, -0.25, 0]} fontSize={0.22} color="rgba(255,255,255,0.7)" font={undefined}>
+      <Text position={[-0.2, -0.25, 0]} fontSize={0.22} color="#64748B" font={undefined}>
         O
       </Text>
       {/* Grid on ground plane */}
@@ -196,8 +196,8 @@ function Axes3D({ size = 4 }) {
         const p2b = new THREE.Vector3(size, 0, val)
         return (
           <group key={`grid-${val}`}>
-            <mesh><tubeGeometry args={[new THREE.LineCurve3(p1a, p1b), 1, 0.008, 4, false]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.06} /></mesh>
-            <mesh><tubeGeometry args={[new THREE.LineCurve3(p2a, p2b), 1, 0.008, 4, false]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.06} /></mesh>
+            <mesh><tubeGeometry args={[new THREE.LineCurve3(p1a, p1b), 1, 0.008, 4, false]} /><meshBasicMaterial color="#90CAF9" transparent opacity={0.4} /></mesh>
+            <mesh><tubeGeometry args={[new THREE.LineCurve3(p2a, p2b), 1, 0.008, 4, false]} /><meshBasicMaterial color="#90CAF9" transparent opacity={0.4} /></mesh>
           </group>
         )
       })}
@@ -248,13 +248,13 @@ function Scene({ preset, sweepAngle, wireframe }) {
 
   return (
     <>
-      <color attach="background" args={['#080812']} />
-      <fog attach="fog" args={['#080812', 12, 30]} />
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 8, 5]} intensity={1.5} color="#ffffff" castShadow />
-      <directionalLight position={[-5, 3, -5]} intensity={0.5} color="#667eea" />
-      <pointLight position={[0, -3, 0]} intensity={0.3} color="#764ba2" />
-      <spotLight position={[0, 8, 0]} intensity={0.8} angle={0.5} penumbra={0.5} color="#a78bfa" />
+      <color attach="background" args={['#FFFFFF']} />
+      <fog attach="fog" args={['#FFFFFF', 12, 30]} />
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[5, 8, 5]} intensity={1.2} color="#ffffff" castShadow />
+      <directionalLight position={[-5, 3, -5]} intensity={0.4} color="#42A5F5" />
+      <pointLight position={[0, -3, 0]} intensity={0.3} color="#1565C0" />
+      <spotLight position={[0, 8, 0]} intensity={0.6} angle={0.5} penumbra={0.5} color="#42A5F5" />
 
       <Axes3D size={Math.max(b, maxY, 3)} />
 
@@ -299,50 +299,50 @@ export default function SolidOfRevModule() {
   return (
     <div className="flex flex-col h-full">
       {/* 3D Canvas — fills most of screen */}
-      <div className="relative rounded-2xl overflow-hidden mb-4 border border-white/5"
-        style={{ height: 'clamp(400px, 55vh, 650px)', background: '#080812' }}>
+      <div className="relative rounded-2xl overflow-hidden mb-4 border border-[#BBDEFB]"
+        style={{ height: 'clamp(400px, 55vh, 650px)', background: '#FFFFFF', boxShadow: '0 2px 12px rgba(21,101,192,0.08)' }}>
         <Canvas key={key} camera={{ position: [5, 3, 5], fov: 40 }} dpr={[1, 2]} shadows>
           <Scene preset={preset} sweepAngle={sweepAngle} wireframe={wireframe} />
         </Canvas>
 
         {/* Top-left label */}
-        <div className="absolute top-4 left-4 px-4 py-2 rounded-xl text-sm font-mono text-white/90"
-          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
+        <div className="absolute top-4 left-4 px-4 py-2 rounded-xl text-sm font-mono text-[#0D1B2A]"
+          style={{ background: 'rgba(240,247,255,0.92)', backdropFilter: 'blur(8px)', border: '1px solid #BBDEFB' }}>
           {preset.label} · x-axis
         </div>
 
         {/* Top-right AR button */}
         <Link to="/ar" className="absolute top-4 right-4">
           <motion.button whileTap={{ scale: 0.95 }}
-            className="px-4 py-2 text-sm font-heading font-semibold text-purple-300 rounded-xl border border-purple-500/40 hover:bg-purple-500/10 transition-colors"
-            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
+            className="px-4 py-2 text-sm font-heading font-semibold text-[#1565C0] rounded-xl border border-[#1565C0] hover:bg-[#E3F2FD] transition-colors"
+            style={{ background: 'rgba(240,247,255,0.92)', backdropFilter: 'blur(8px)' }}>
             🔮 View in AR
           </motion.button>
         </Link>
 
         {/* Bottom sweep indicator */}
         <div className="absolute bottom-4 left-4 right-4">
-          <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
+          <div className="h-1 rounded-full overflow-hidden" style={{ background: '#E3F2FD' }}>
             <div className="h-full rounded-full transition-all duration-100"
-              style={{ width: `${(sweepAngle / (Math.PI * 2)) * 100}%`, background: `linear-gradient(90deg, ${preset.color}, #a78bfa)` }} />
+              style={{ width: `${(sweepAngle / (Math.PI * 2)) * 100}%`, background: `linear-gradient(90deg, ${preset.color}, #42A5F5)` }} />
           </div>
         </div>
       </div>
 
       {/* Volume formula */}
-      <div className="glass p-5 rounded-2xl mb-4" style={{ background: 'rgba(102,126,234,0.06)' }}>
-        <p className="text-white/40 text-sm font-mono mb-2">Volume (Disc Method)</p>
+      <div className="glass p-5 rounded-2xl mb-4" style={{ background: '#E3F2FD' }}>
+        <p className="text-[#1565C0] text-sm font-mono mb-2">Volume (Disc Method)</p>
         <BlockMathDisplay math={`V = \\pi\\int_{${preset.bounds[0]}}^{${Number(preset.bounds[1]).toFixed(2)}} \\left(${preset.fnStr}\\right)^2 dx = ${preset.volume}`} />
       </div>
 
       {/* Sweep angle slider */}
       <div className="glass p-4 rounded-2xl mb-4">
         <div className="flex justify-between mb-2">
-          <p className="text-white/50 text-sm font-heading">Rotation Angle</p>
-          <p className="text-purple-300 text-sm font-mono font-bold">{((sweepAngle / (Math.PI * 2)) * 360).toFixed(0)}°</p>
+          <p className="text-[#64748B] text-sm font-heading">Rotation Angle</p>
+          <p className="text-[#1565C0] text-sm font-mono font-bold">{((sweepAngle / (Math.PI * 2)) * 360).toFixed(0)}°</p>
         </div>
         <input type="range" min={0.01} max={Math.PI * 2} step={0.05} value={sweepAngle}
-          onChange={(e) => setSweepAngle(Number(e.target.value))} className="w-full accent-purple-500" />
+          onChange={(e) => setSweepAngle(Number(e.target.value))} className="w-full" style={{ accentColor: '#1565C0' }} />
       </div>
 
       {/* Controls */}
@@ -358,15 +358,17 @@ export default function SolidOfRevModule() {
 
       {/* Preset selector */}
       <div className="glass p-5 rounded-2xl">
-        <p className="text-white/50 text-sm font-heading mb-3">Select Function</p>
+        <p className="text-[#64748B] text-sm font-heading mb-3">Select Function</p>
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((p, i) => (
             <motion.button key={i} whileTap={{ scale: 0.95 }}
               onClick={() => { setPresetIdx(i); setKey((k) => k + 1); setSweepAngle(0.01) }}
               className={`px-4 py-3 rounded-xl text-sm font-mono font-semibold transition-all ${
-                presetIdx === i ? 'text-white border-2' : 'text-white/50 border border-white/10 hover:border-white/30'
+                presetIdx === i ? 'border-2' : 'border'
               }`}
-              style={presetIdx === i ? { background: `${p.color}25`, borderColor: `${p.color}80` } : {}}>
+              style={presetIdx === i
+                ? { background: `${p.color}25`, borderColor: p.color, color: p.color }
+                : { background: '#F0F7FF', borderColor: '#BBDEFB', color: '#64748B' }}>
               {p.label}
             </motion.button>
           ))}

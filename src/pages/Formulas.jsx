@@ -7,7 +7,7 @@ const CATEGORIES = [
   {
     name: 'Limits',
     icon: '→',
-    color: '#667eea',
+    color: '#1565C0',
     formulas: [
       { title: 'Limit Definition', math: '\\lim_{x \\to a} f(x) = L' },
       { title: "L'Hôpital's Rule", math: "\\lim_{x \\to a} \\frac{f(x)}{g(x)} = \\lim_{x \\to a} \\frac{f'(x)}{g'(x)}" },
@@ -19,7 +19,7 @@ const CATEGORIES = [
   {
     name: 'Derivatives',
     icon: "f'",
-    color: '#a78bfa',
+    color: '#42A5F5',
     formulas: [
       { title: 'Power Rule', math: '\\frac{d}{dx} x^n = nx^{n-1}' },
       { title: 'Product Rule', math: '(fg)\' = f\'g + fg\'' },
@@ -80,10 +80,12 @@ export default function Formulas() {
               onClick={() => setActiveCategory(i)}
               className={`flex-shrink-0 px-4 py-3 rounded-xl text-sm font-heading font-semibold border transition-all flex items-center gap-2 ${
                 activeCategory === i
-                  ? 'text-white border-2'
-                  : 'text-white/50 border-white/10 hover:border-white/30'
+                  ? 'border-2'
+                  : 'border'
               }`}
-              style={activeCategory === i ? { background: `${cat.color}20`, borderColor: `${cat.color}80` } : {}}
+              style={activeCategory === i
+                ? { background: `${cat.color}20`, borderColor: cat.color, color: cat.color }
+                : { background: '#F0F7FF', borderColor: '#BBDEFB', color: '#64748B' }}
             >
               <span className="font-mono">{cat.icon}</span>
               {cat.name}
@@ -100,9 +102,9 @@ export default function Formulas() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: i * 0.05 }}
               className="glass p-5 rounded-2xl"
-              style={{ borderLeft: `3px solid ${CATEGORIES[activeCategory].color}40` }}
+              style={{ borderLeft: `3px solid ${CATEGORIES[activeCategory].color}` }}
             >
-              <p className="text-white/50 text-xs font-heading font-semibold mb-3 uppercase tracking-wider">
+              <p className="text-[#1565C0] text-xs font-heading font-semibold mb-3 uppercase tracking-wider">
                 {formula.title}
               </p>
               <BlockMathDisplay math={formula.math} />

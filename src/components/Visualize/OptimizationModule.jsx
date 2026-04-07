@@ -81,8 +81,8 @@ export default function OptimizationModule() {
     }
 
     // f(x) curve — glow
-    ctx.strokeStyle = '#667eea'; ctx.lineWidth = 3.5
-    ctx.shadowColor = '#667eea'; ctx.shadowBlur = 10
+    ctx.strokeStyle = '#1565C0'; ctx.lineWidth = 3.5
+    ctx.shadowColor = '#1565C0'; ctx.shadowBlur = 10
     ctx.beginPath(); let started = false
     for (let i = 0; i <= 500; i++) {
       const x = domain[0] + (domain[1] - domain[0]) * (i / 500)
@@ -110,38 +110,38 @@ export default function OptimizationModule() {
       ctx.beginPath(); ctx.arc(cx, cy, 7, 0, Math.PI * 2)
       ctx.fillStyle = color; ctx.fill()
       ctx.shadowBlur = 0
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke()
+      ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2; ctx.stroke()
 
       // Label
-      ctx.fillStyle = '#fff'; ctx.font = 'bold 12px "Space Grotesk", sans-serif'
+      ctx.fillStyle = '#0D1B2A'; ctx.font = 'bold 12px "Space Grotesk", sans-serif'
       ctx.fillText(type, cx + 18, cy - 12)
-      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '11px monospace'
+      ctx.fillStyle = '#64748B'; ctx.font = '11px monospace'
       ctx.fillText(`(${x.toFixed(2)}, ${y.toFixed(2)})`, cx + 18, cy + 4)
     })
   }, [presetIdx, showDeriv, showIncDec, preset, domain])
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-2xl overflow-hidden border border-white/5"
-        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(102,126,234,0.06) 0%, #080812 70%)' }}>
+      <div className="rounded-2xl overflow-hidden border border-[#BBDEFB]"
+        style={{ background: '#FFFFFF', boxShadow: '0 2px 12px rgba(21,101,192,0.08)' }}>
         <canvas ref={canvasRef} width={W} height={H} className="w-full" style={{ maxHeight: 500 }} />
       </div>
 
-      <div className="glass p-4 rounded-2xl" style={{ background: 'rgba(102,126,234,0.06)' }}>
+      <div className="glass p-4 rounded-2xl" style={{ background: '#E3F2FD' }}>
         <BlockMathDisplay math={`${preset.derivLatex} = 0`} />
       </div>
 
       {/* Critical points cards */}
       <div className="glass p-4 rounded-2xl">
-        <p className="text-white/50 text-sm font-heading mb-3">Critical Points</p>
+        <p className="text-[#64748B] text-sm font-heading mb-3">Critical Points</p>
         <div className="flex flex-wrap gap-3">
           {preset.criticals.map(({ x, type, color }) => (
-            <div key={x} className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10"
-              style={{ background: `${color}08` }}>
-              <div className="w-4 h-4 rounded-full" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
+            <div key={x} className="flex items-center gap-3 px-4 py-3 rounded-xl border"
+              style={{ background: `${color}10`, borderColor: color }}>
+              <div className="w-4 h-4 rounded-full" style={{ background: color }} />
               <div>
-                <p className="text-white text-sm font-heading font-semibold">{type}</p>
-                <p className="text-white/40 text-xs font-mono">x = {x.toFixed(3)}, y = {preset.fn(x).toFixed(3)}</p>
+                <p className="text-[#0D1B2A] text-sm font-heading font-semibold">{type}</p>
+                <p className="text-[#64748B] text-xs font-mono">x = {x.toFixed(3)}, y = {preset.fn(x).toFixed(3)}</p>
               </div>
             </div>
           ))}
@@ -164,7 +164,7 @@ export default function OptimizationModule() {
         {PRESETS.map((p, i) => (
           <motion.button key={i} whileTap={{ scale: 0.95 }} onClick={() => setPresetIdx(i)}
             className={`flex-1 py-3 rounded-xl text-sm font-mono border transition-all ${
-              presetIdx === i ? 'border-purple-500/50 bg-purple-500/20 text-white' : 'border-white/10 text-white/50'
+              presetIdx === i ? 'border-2 border-[#1565C0] bg-[#E3F2FD] text-[#1565C0]' : 'border-[#BBDEFB] bg-[#F0F7FF] text-[#64748B]'
             }`}>
             {p.label}
           </motion.button>
