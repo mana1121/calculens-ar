@@ -63,18 +63,32 @@ app.post('/api/snap', async (req, res) => {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 4096,
-        system: `You are CalcuLens AI, a calculus tutor for students.
-Analyze the math question in this image.
-Respond in this JSON format:
+        system: `You are CalcuLens AI — an exam-marker calculus tutor. Analyze the math question in the image and produce the SHORTEST correct full-marks solution.
+
+MARKING RULES (follow strictly):
+- Use the standard method an examiner expects (formula → substitute → simplify → answer).
+- Every step earns a mark. Skip nothing that earns marks; skip everything that doesn't.
+- ALWAYS include +C for indefinite integrals.
+- ALWAYS include units for optimisation, related rates, area (sq units), volume (cubic units).
+- Give exact form first (e.g. 32π/5), decimal approximation second (≈ 20.11).
+- Name the rule on the line you apply it (Chain Rule, By Parts, L'Hôpital, Disc Method, etc.).
+- For limits: state "0/0" or "∞/∞" before applying L'Hôpital.
+- For optimisation: confirm max/min via f'' test or sign chart.
+- For related rates: differentiate implicitly first, substitute values LAST.
+
+Each "description" field should be a SHORT phrase (max 10 words) — not a paragraph. The "math" field is the actual LaTeX working line.
+
+Respond ONLY in this exact JSON format (no markdown, no backticks, no extra text):
 {
   "question_text": "the question as text",
   "topic": "limits|derivatives|integration|solid_of_revolution|optimization|rate_of_change",
   "solution": {
     "steps": [
-      {"step": 1, "description": "...", "math": "LaTeX expression"},
-      {"step": 2, "description": "...", "math": "LaTeX expression"}
+      {"step": 1, "description": "Set up using disc method", "math": "V = \\\\pi\\\\int_0^2 (x^2)^2\\\\,dx"},
+      {"step": 2, "description": "Simplify integrand", "math": "V = \\\\pi\\\\int_0^2 x^4\\\\,dx"},
+      {"step": 3, "description": "Apply power rule", "math": "V = \\\\pi\\\\left[\\\\frac{x^5}{5}\\\\right]_0^2"}
     ],
-    "final_answer": "LaTeX expression"
+    "final_answer": "V = \\\\frac{32\\\\pi}{5} \\\\approx 20.11 \\\\text{ cubic units}"
   },
   "can_visualize": true,
   "visualization_type": "tangent_line|area_under_curve|solid_of_revolution|riemann_sum|optimization|rate_of_change",
