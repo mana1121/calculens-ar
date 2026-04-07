@@ -7,11 +7,11 @@ import { BlockMathDisplay } from '../Shared/MathDisplay.jsx'
 import { Link } from 'react-router-dom'
 
 const PRESETS = [
-  { label: 'y = x²', fn: (x) => x * x, fnStr: 'x^2', bounds: [0, 2], volume: '\\frac{32\\pi}{5} \\approx 20.11', color: '#1565C0' },
-  { label: 'y = x', fn: (x) => x, fnStr: 'x', bounds: [0, 3], volume: '9\\pi \\approx 28.27', color: '#42A5F5' },
-  { label: 'y = √x', fn: (x) => Math.sqrt(Math.max(0, x)), fnStr: '\\sqrt{x}', bounds: [0, 4], volume: '8\\pi \\approx 25.13', color: '#34d399' },
-  { label: 'y = sin(x)', fn: (x) => Math.sin(x), fnStr: '\\sin(x)', bounds: [0, Math.PI], volume: '\\frac{\\pi^2}{2} \\approx 4.93', color: '#f59e0b' },
-  { label: 'y = 1/x', fn: (x) => 1 / x, fnStr: '\\frac{1}{x}', bounds: [1, 3], volume: '\\frac{2\\pi}{3} \\approx 2.09', color: '#f87171' },
+  { label: 'y = x²', fn: (x) => x * x, fnStr: 'x^2', bounds: [0, 2], volume: '\\frac{32\\pi}{5} \\approx 20.11', area: '\\frac{8}{3} \\approx 2.67', color: '#1565C0' },
+  { label: 'y = x', fn: (x) => x, fnStr: 'x', bounds: [0, 3], volume: '9\\pi \\approx 28.27', area: '\\frac{9}{2} = 4.5', color: '#42A5F5' },
+  { label: 'y = √x', fn: (x) => Math.sqrt(Math.max(0, x)), fnStr: '\\sqrt{x}', bounds: [0, 4], volume: '8\\pi \\approx 25.13', area: '\\frac{16}{3} \\approx 5.33', color: '#34d399' },
+  { label: 'y = sin(x)', fn: (x) => Math.sin(x), fnStr: '\\sin(x)', bounds: [0, Math.PI], volume: '\\frac{\\pi^2}{2} \\approx 4.93', area: '2', color: '#f59e0b' },
+  { label: 'y = 1/x', fn: (x) => 1 / x, fnStr: '\\frac{1}{x}', bounds: [1, 3], volume: '\\frac{2\\pi}{3} \\approx 2.09', area: '\\ln 3 \\approx 1.10', color: '#f87171' },
 ]
 
 // 2D curve in world space — standard math: x along X-axis, f(x) along Y-axis
@@ -33,6 +33,63 @@ function CurvePreview({ fn, bounds }) {
     <mesh geometry={curveGeo}>
       <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={0.8} />
     </mesh>
+  )
+}
+
+// 2D filled area under the curve — represents ∫f(x) dx
+// Builds a flat polygon from (a, 0) → curve → (b, 0) lying in the X-Y plane (z=0)
+function AreaUnderCurve({ fn, bounds, color }) {
+  const geo = useMemo(() => {
+    const N = 100
+    const positions = []
+    const indices = []
+
+    // Build vertices: alternating bottom (y=0) and top (y=f(x)) at each x
+    for (let i = 0; i <= N; i++) {
+      const x = a => bounds[0] + (bounds[1] - bounds[0]) * (a / N)
+      const xPos = x(i)
+      const yTop = Math.max(0, fn(xPos))
+      // bottom vertex (on x-axis)
+      positions.push(xPos, 0, 0)
+      // top vertex (on curve)
+      positions.push(xPos, yTop, 0)
+    }
+
+    // Build triangle pairs between consecutive columns
+    for (let i = 0; i < N; i++) {
+      const b0 = i * 2       // bottom-left
+      const t0 = i * 2 + 1   // top-left
+      const b1 = (i + 1) * 2 // bottom-right
+      const t1 = (i + 1) * 2 + 1 // top-right
+      indices.push(b0, b1, t0)
+      indices.push(t0, b1, t1)
+    }
+
+    const g = new THREE.BufferGeometry()
+    g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    g.setIndex(indices)
+    g.computeVertexNormals()
+    return g
+  }, [fn, bounds])
+
+  return (
+    <group>
+      {/* Filled area */}
+      <mesh geometry={geo}>
+        <meshStandardMaterial
+          color={color}
+          transparent
+          opacity={0.55}
+          side={THREE.DoubleSide}
+          emissive={color}
+          emissiveIntensity={0.15}
+        />
+      </mesh>
+      {/* Hatch-like wireframe overlay for clarity */}
+      <mesh geometry={geo}>
+        <meshBasicMaterial color={color} wireframe transparent opacity={0.4} side={THREE.DoubleSide} />
+      </mesh>
+    </group>
   )
 }
 
@@ -234,7 +291,7 @@ function AutoFit({ bounds, fn }) {
   return null
 }
 
-function Scene({ preset, sweepAngle, wireframe }) {
+function Scene({ preset, sweepAngle, wireframe, mode }) {
   const showSolid = sweepAngle > 0.15
   const [a, b] = preset.bounds
   const cx = (a + b) / 2
@@ -261,8 +318,11 @@ function Scene({ preset, sweepAngle, wireframe }) {
       {/* Always show the 2D curve as reference */}
       <CurvePreview fn={preset.fn} bounds={preset.bounds} />
 
-      {/* Show solid when sweep starts */}
-      {showSolid && <Solid fn={preset.fn} bounds={preset.bounds} sweepAngle={sweepAngle} color={preset.color} wireframe={wireframe} />}
+      {/* AREA mode: show 2D filled area under curve */}
+      {mode === 'area' && <AreaUnderCurve fn={preset.fn} bounds={preset.bounds} color={preset.color} />}
+
+      {/* VOLUME mode: show 3D solid of revolution when sweep starts */}
+      {mode === 'volume' && showSolid && <Solid fn={preset.fn} bounds={preset.bounds} sweepAngle={sweepAngle} color={preset.color} wireframe={wireframe} />}
 
       <AutoFit bounds={preset.bounds} fn={preset.fn} />
 
@@ -277,6 +337,7 @@ export default function SolidOfRevModule() {
   const [wireframe, setWireframe] = useState(true)
   const [animating, setAnimating] = useState(false)
   const [key, setKey] = useState(0)
+  const [mode, setMode] = useState('volume') // 'volume' | 'area'
 
   const preset = PRESETS[presetIdx]
 
@@ -302,13 +363,13 @@ export default function SolidOfRevModule() {
       <div className="relative rounded-2xl overflow-hidden mb-4 border border-[#BBDEFB]"
         style={{ height: 'clamp(400px, 55vh, 650px)', background: '#FFFFFF', boxShadow: '0 2px 12px rgba(21,101,192,0.08)' }}>
         <Canvas key={key} camera={{ position: [5, 3, 5], fov: 40 }} dpr={[1, 2]} shadows>
-          <Scene preset={preset} sweepAngle={sweepAngle} wireframe={wireframe} />
+          <Scene preset={preset} sweepAngle={sweepAngle} wireframe={wireframe} mode={mode} />
         </Canvas>
 
         {/* Top-left label */}
         <div className="absolute top-4 left-4 px-4 py-2 rounded-xl text-sm font-mono text-[#0D1B2A]"
           style={{ background: 'rgba(240,247,255,0.92)', backdropFilter: 'blur(8px)', border: '1px solid #BBDEFB' }}>
-          {preset.label} · x-axis
+          {preset.label} · {mode === 'area' ? 'Area' : 'Volume'}
         </div>
 
         {/* Top-right AR button */}
@@ -329,32 +390,67 @@ export default function SolidOfRevModule() {
         </div>
       </div>
 
-      {/* Volume formula */}
-      <div className="glass p-5 rounded-2xl mb-4" style={{ background: '#E3F2FD' }}>
-        <p className="text-[#1565C0] text-sm font-mono mb-2">Volume (Disc Method)</p>
-        <BlockMathDisplay math={`V = \\pi\\int_{${preset.bounds[0]}}^{${Number(preset.bounds[1]).toFixed(2)}} \\left(${preset.fnStr}\\right)^2 dx = ${preset.volume}`} />
-      </div>
-
-      {/* Sweep angle slider */}
-      <div className="glass p-4 rounded-2xl mb-4">
-        <div className="flex justify-between mb-2">
-          <p className="text-[#64748B] text-sm font-heading">Rotation Angle</p>
-          <p className="text-[#1565C0] text-sm font-mono font-bold">{((sweepAngle / (Math.PI * 2)) * 360).toFixed(0)}°</p>
-        </div>
-        <input type="range" min={0.01} max={Math.PI * 2} step={0.05} value={sweepAngle}
-          onChange={(e) => setSweepAngle(Number(e.target.value))} className="w-full" style={{ accentColor: '#1565C0' }} />
-      </div>
-
-      {/* Controls */}
+      {/* Mode toggle: Area vs Volume */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <button onClick={handleAnimate} disabled={animating}
-          className="btn-primary py-4 text-base disabled:opacity-50">
-          {animating ? '⟳ Rotating...' : '▶ Animate Rotation'}
-        </button>
-        <button onClick={() => setWireframe((w) => !w)} className="btn-secondary py-4 text-base">
-          {wireframe ? '◻ Hide Wireframe' : '◻ Show Wireframe'}
-        </button>
+        <motion.button whileTap={{ scale: 0.97 }}
+          onClick={() => setMode('area')}
+          className="py-3 rounded-xl text-sm font-heading font-bold transition-all"
+          style={mode === 'area'
+            ? { background: '#1565C0', color: '#FFFFFF', boxShadow: '0 4px 16px rgba(21,101,192,0.25)' }
+            : { background: '#F0F7FF', color: '#1565C0', border: '1.5px solid #90CAF9' }}>
+          📐 Area Mode
+        </motion.button>
+        <motion.button whileTap={{ scale: 0.97 }}
+          onClick={() => setMode('volume')}
+          className="py-3 rounded-xl text-sm font-heading font-bold transition-all"
+          style={mode === 'volume'
+            ? { background: '#1565C0', color: '#FFFFFF', boxShadow: '0 4px 16px rgba(21,101,192,0.25)' }
+            : { background: '#F0F7FF', color: '#1565C0', border: '1.5px solid #90CAF9' }}>
+          🧊 Volume Mode
+        </motion.button>
       </div>
+
+      {/* Formula card — switches between Area and Volume */}
+      <div className="glass p-5 rounded-2xl mb-4" style={{ background: '#E3F2FD' }}>
+        {mode === 'area' ? (
+          <>
+            <p className="text-[#1565C0] text-sm font-mono mb-2">Area Under Curve</p>
+            <BlockMathDisplay math={`A = \\int_{${preset.bounds[0]}}^{${Number(preset.bounds[1]).toFixed(2)}} ${preset.fnStr}\\,dx = ${preset.area}`} />
+            <p className="text-[#64748B] text-xs mt-2">2D area between curve and x-axis (square units)</p>
+          </>
+        ) : (
+          <>
+            <p className="text-[#1565C0] text-sm font-mono mb-2">Volume (Disc Method)</p>
+            <BlockMathDisplay math={`V = \\pi\\int_{${preset.bounds[0]}}^{${Number(preset.bounds[1]).toFixed(2)}} \\left(${preset.fnStr}\\right)^2 dx = ${preset.volume}`} />
+            <p className="text-[#64748B] text-xs mt-2">3D volume of solid revolved about x-axis (cubic units)</p>
+          </>
+        )}
+      </div>
+
+      {/* Sweep angle slider — only relevant in volume mode */}
+      {mode === 'volume' && (
+        <div className="glass p-4 rounded-2xl mb-4">
+          <div className="flex justify-between mb-2">
+            <p className="text-[#64748B] text-sm font-heading">Rotation Angle</p>
+            <p className="text-[#1565C0] text-sm font-mono font-bold">{((sweepAngle / (Math.PI * 2)) * 360).toFixed(0)}°</p>
+          </div>
+          <input type="range" min={0.01} max={Math.PI * 2} step={0.05} value={sweepAngle}
+            onChange={(e) => setSweepAngle(Number(e.target.value))} className="w-full" style={{ accentColor: '#1565C0' }} />
+        </div>
+      )}
+
+      {/* Controls — only relevant in volume mode */}
+      {mode === 'volume' && (
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <button onClick={handleAnimate} disabled={animating}
+            className="btn-primary py-4 text-base disabled:opacity-50">
+            {animating ? '⟳ Rotating...' : '▶ Animate Rotation'}
+          </button>
+          <button onClick={() => setWireframe((w) => !w)} className="btn-secondary py-4 text-base">
+            {wireframe ? '◻ Hide Wireframe' : '◻ Show Wireframe'}
+          </button>
+        </div>
+      )}
 
       {/* Preset selector */}
       <div className="glass p-5 rounded-2xl">
