@@ -36,61 +36,70 @@ function CurvePreview({ fn, bounds }) {
   )
 }
 
-// 3D solid of revolution
+// 3D solid of revolution — revolves the curve y=f(x) around the X axis
+// Surface: (x, f(x)·cos(θ), f(x)·sin(θ)) for x in [a,b], θ in [0, sweepAngle]
 function Solid({ fn, bounds, sweepAngle, color, wireframe }) {
-  const groupRef = useRef()
   const [a, b] = bounds
 
-  useFrame((_, dt) => {
-    if (groupRef.current) groupRef.current.rotation.y += dt * 0.15
-  })
-
   const geo = useMemo(() => {
-    const pts = []
-    const N = 150
+    const N = 100
+    const M = 64
+    const positions = []
+    const indices = []
+
     for (let i = 0; i <= N; i++) {
-      const t = i / N
-      const x = a + (b - a) * t
-      const y = Math.max(0.0001, fn(x))
-      pts.push(new THREE.Vector2(y, x))
+      const x = a + (b - a) * (i / N)
+      const r = Math.max(0, fn(x))
+      for (let j = 0; j <= M; j++) {
+        const theta = (j / M) * sweepAngle
+        const y = r * Math.cos(theta)
+        const z = r * Math.sin(theta)
+        positions.push(x, y, z)
+      }
     }
-    const g = new THREE.LatheGeometry(pts, 96, 0, sweepAngle)
-    g.computeBoundingBox()
-    const c = new THREE.Vector3()
-    g.boundingBox.getCenter(c)
-    g.translate(-c.x, -c.y, -c.z)
-    g.rotateZ(Math.PI / 2)
+
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < M; j++) {
+        const v0 = i * (M + 1) + j
+        const v1 = v0 + 1
+        const v2 = (i + 1) * (M + 1) + j
+        const v3 = v2 + 1
+        indices.push(v0, v2, v1)
+        indices.push(v1, v2, v3)
+      }
+    }
+
+    const g = new THREE.BufferGeometry()
+    g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    g.setIndex(indices)
+    g.computeVertexNormals()
     return g
   }, [fn, a, b, sweepAngle])
 
   return (
-    <group ref={groupRef}>
+    <group>
       {/* Main solid */}
-      <mesh geometry={geo} scale={1}>
+      <mesh geometry={geo}>
         <meshPhysicalMaterial
           color={color}
           transparent
-          opacity={0.8}
+          opacity={0.75}
           side={THREE.DoubleSide}
           metalness={0.15}
-          roughness={0.1}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
+          roughness={0.2}
+          clearcoat={0.8}
+          clearcoatRoughness={0.2}
           envMapIntensity={0.8}
           emissive={color}
-          emissiveIntensity={0.05}
+          emissiveIntensity={0.1}
         />
       </mesh>
       {/* Wireframe overlay */}
       {wireframe && (
-        <mesh geometry={geo} scale={1}>
-          <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
+        <mesh geometry={geo}>
+          <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.1} side={THREE.DoubleSide} />
         </mesh>
       )}
-      {/* Inner glow mesh */}
-      <mesh geometry={geo} scale={0.995}>
-        <meshBasicMaterial color={color} transparent opacity={0.05} side={THREE.BackSide} />
-      </mesh>
     </group>
   )
 }
@@ -196,59 +205,68 @@ function Axes3D({ size = 4 }) {
   )
 }
 
-// Auto-fit camera to geometry
+// Auto-fit camera to geometry — frames the curve and revolved solid
 function AutoFit({ bounds, fn }) {
-  const { camera } = useThree()
+  const { camera, controls } = useThree()
   const [a, b] = bounds
 
   useEffect(() => {
-    // Calculate bounding sphere radius
-    let maxR = 0
+    let maxY = 0
     for (let i = 0; i <= 50; i++) {
       const x = a + (b - a) * (i / 50)
-      const y = fn(x)
-      const r = Math.sqrt(x * x + y * y)
-      if (r > maxR) maxR = r
+      const y = Math.abs(fn(x))
+      if (y > maxY) maxY = y
     }
-    const dist = Math.max(maxR * 2.2, 3)
-    camera.position.set(dist * 0.8, dist * 0.5, dist * 0.8)
-    camera.lookAt(0, 0, 0)
+    const xRange = b - a
+    const size = Math.max(xRange, maxY * 2)
+    const dist = Math.max(size * 1.8, 4)
+    const cx = (a + b) / 2
+    const cy = maxY / 2
+    camera.position.set(cx + dist * 0.7, cy + dist * 0.5, dist * 0.7)
+    camera.lookAt(cx, cy, 0)
     camera.updateProjectionMatrix()
-  }, [bounds, fn, camera, a, b])
+    if (controls && controls.target) {
+      controls.target.set(cx, cy, 0)
+      controls.update()
+    }
+  }, [bounds, fn, camera, controls, a, b])
 
   return null
 }
 
 function Scene({ preset, sweepAngle, wireframe }) {
   const showSolid = sweepAngle > 0.15
+  const [a, b] = preset.bounds
+  const cx = (a + b) / 2
+  let maxY = 0
+  for (let i = 0; i <= 20; i++) {
+    const x = a + (b - a) * (i / 20)
+    const y = Math.abs(preset.fn(x))
+    if (y > maxY) maxY = y
+  }
+  const cy = maxY / 2
 
   return (
     <>
       <color attach="background" args={['#080812']} />
-      <fog attach="fog" args={['#080812', 8, 25]} />
-      <ambientLight intensity={0.4} />
+      <fog attach="fog" args={['#080812', 12, 30]} />
+      <ambientLight intensity={0.5} />
       <directionalLight position={[5, 8, 5]} intensity={1.5} color="#ffffff" castShadow />
       <directionalLight position={[-5, 3, -5]} intensity={0.5} color="#667eea" />
       <pointLight position={[0, -3, 0]} intensity={0.3} color="#764ba2" />
       <spotLight position={[0, 8, 0]} intensity={0.8} angle={0.5} penumbra={0.5} color="#a78bfa" />
 
-      <Axes3D size={3} />
+      <Axes3D size={Math.max(b, maxY, 3)} />
 
-      {/* Before animation: show 2D curve in standard math orientation */}
-      {!showSolid && <CurvePreview fn={preset.fn} bounds={preset.bounds} />}
+      {/* Always show the 2D curve as reference */}
+      <CurvePreview fn={preset.fn} bounds={preset.bounds} />
 
-      {/* During/after animation: show the 3D solid */}
+      {/* Show solid when sweep starts */}
       {showSolid && <Solid fn={preset.fn} bounds={preset.bounds} sweepAngle={sweepAngle} color={preset.color} wireframe={wireframe} />}
 
       <AutoFit bounds={preset.bounds} fn={preset.fn} />
 
-      {/* Ground reflection */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.5, 0]}>
-        <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#0a0a1a" metalness={0.8} roughness={0.3} transparent opacity={0.5} />
-      </mesh>
-
-      <OrbitControls enablePan={false} minDistance={2} maxDistance={15} target={[0, 0, 0]} />
+      <OrbitControls enablePan={false} minDistance={2} maxDistance={20} target={[cx, cy, 0]} />
     </>
   )
 }

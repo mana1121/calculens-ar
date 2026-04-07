@@ -252,52 +252,64 @@ function CurvePreview({ fn, bounds }) {
   )
 }
 
-// 3D solid of revolution
+// 3D solid of revolution — revolves the curve y=f(x) around the X axis
+// Surface: (x, f(x)·cos(θ), f(x)·sin(θ)) for x in [a,b], θ in [0, sweepAngle]
 function RevolutionSolid({ fn, bounds, sweepAngle, color }) {
-  const groupRef = useRef()
   const [a, b] = bounds
 
-  useFrame((_, dt) => {
-    if (groupRef.current) groupRef.current.rotation.y += dt * 0.15
-  })
-
-  // Build geometry with axis of revolution along X
   const geo = useMemo(() => {
-    const pts = []
-    const N = 150
+    const N = 100      // x divisions
+    const M = 64       // angular divisions
+    const positions = []
+    const indices = []
+
     for (let i = 0; i <= N; i++) {
-      const t = i / N
-      const x = a + (b - a) * t
-      const y = Math.max(0.0001, fn(x))
-      pts.push(new THREE.Vector2(y, x))
+      const x = a + (b - a) * (i / N)
+      const r = Math.max(0, fn(x))
+      for (let j = 0; j <= M; j++) {
+        const theta = (j / M) * sweepAngle
+        const y = r * Math.cos(theta)
+        const z = r * Math.sin(theta)
+        positions.push(x, y, z)
+      }
     }
-    const g = new THREE.LatheGeometry(pts, 96, 0, sweepAngle)
-    g.computeBoundingBox()
-    const c = new THREE.Vector3()
-    g.boundingBox.getCenter(c)
-    g.translate(-c.x, -c.y, -c.z)
-    g.rotateZ(Math.PI / 2)
+
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < M; j++) {
+        const v0 = i * (M + 1) + j
+        const v1 = v0 + 1
+        const v2 = (i + 1) * (M + 1) + j
+        const v3 = v2 + 1
+        indices.push(v0, v2, v1)
+        indices.push(v1, v2, v3)
+      }
+    }
+
+    const g = new THREE.BufferGeometry()
+    g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+    g.setIndex(indices)
+    g.computeVertexNormals()
     return g
   }, [fn, a, b, sweepAngle])
 
   return (
-    <group ref={groupRef}>
+    <group>
       <mesh geometry={geo}>
         <meshPhysicalMaterial
           color={color}
           transparent
-          opacity={0.8}
+          opacity={0.75}
           side={THREE.DoubleSide}
           metalness={0.15}
-          roughness={0.1}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
+          roughness={0.2}
+          clearcoat={0.8}
+          clearcoatRoughness={0.2}
           emissive={color}
-          emissiveIntensity={0.05}
+          emissiveIntensity={0.1}
         />
       </mesh>
       <mesh geometry={geo}>
-        <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.08} />
+        <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.1} side={THREE.DoubleSide} />
       </mesh>
     </group>
   )
@@ -345,16 +357,19 @@ function AutoFitAR({ bounds, fn }) {
   const fitted = useRef(false)
 
   if (!fitted.current) {
-    let maxR = 0
+    let maxY = 0
     for (let i = 0; i <= 50; i++) {
       const x = a + (b - a) * (i / 50)
-      const y = fn(x)
-      const r = Math.sqrt(x * x + y * y)
-      if (r > maxR) maxR = r
+      const y = Math.abs(fn(x))
+      if (y > maxY) maxY = y
     }
-    const dist = Math.max(maxR * 2.2, 3)
-    camera.position.set(dist * 0.8, dist * 0.5, dist * 0.8)
-    camera.lookAt(0, 0, 0)
+    const xRange = b - a
+    const size = Math.max(xRange, maxY * 2)
+    const dist = Math.max(size * 1.8, 4)
+    const cx = (a + b) / 2
+    const cy = maxY / 2
+    camera.position.set(cx + dist * 0.7, cy + dist * 0.5, dist * 0.7)
+    camera.lookAt(cx, cy, 0)
     camera.updateProjectionMatrix()
     fitted.current = true
   }
@@ -364,27 +379,36 @@ function AutoFitAR({ bounds, fn }) {
 
 function RevolutionScene({ model, sweepAngle }) {
   const showSolid = sweepAngle > 0.15
+  const [a, b] = model.bounds
+  const cx = (a + b) / 2
+  let maxY = 0
+  for (let i = 0; i <= 20; i++) {
+    const x = a + (b - a) * (i / 20)
+    const y = Math.abs(model.fn(x))
+    if (y > maxY) maxY = y
+  }
+  const cy = maxY / 2
 
   return (
     <>
       <color attach="background" args={['#080812']} />
-      <fog attach="fog" args={['#080812', 8, 25]} />
-      <ambientLight intensity={0.4} />
+      <fog attach="fog" args={['#080812', 12, 30]} />
+      <ambientLight intensity={0.5} />
       <directionalLight position={[5, 8, 5]} intensity={1.5} color="#ffffff" />
       <directionalLight position={[-5, 3, -5]} intensity={0.5} color="#667eea" />
       <pointLight position={[0, -3, 0]} intensity={0.3} color="#764ba2" />
 
-      <Axes3D size={3} />
+      <Axes3D size={Math.max(b, maxY, 3)} />
 
-      {/* Before animation: show 2D curve in standard math orientation */}
-      {!showSolid && <CurvePreview fn={model.fn} bounds={model.bounds} />}
+      {/* Always show 2D curve for reference */}
+      <CurvePreview fn={model.fn} bounds={model.bounds} />
 
-      {/* During/after animation: show the 3D solid */}
+      {/* Show solid when sweep starts */}
       {showSolid && <RevolutionSolid fn={model.fn} bounds={model.bounds} sweepAngle={sweepAngle} color={model.color} />}
 
       <AutoFitAR bounds={model.bounds} fn={model.fn} />
 
-      <OrbitControls enablePan={false} minDistance={2} maxDistance={15} target={[0, 0, 0]} />
+      <OrbitControls enablePan={false} minDistance={2} maxDistance={20} target={[cx, cy, 0]} />
     </>
   )
 }
@@ -460,19 +484,22 @@ export default function ARViewer({ selectedTopic }) {
           src={model.src}
           ar
           ar-modes="webxr scene-viewer quick-look"
+          ar-scale="auto"
+          ar-placement="floor"
           camera-controls
+          touch-action="pan-y"
+          interaction-prompt="none"
           auto-rotate
           auto-rotate-delay="0"
           rotation-per-second="12deg"
           shadow-intensity="1"
-          ar-placement="floor"
           style={{ width: '100%', height: isRevolution ? '200px' : '400px', background: 'transparent' }}
-          scale="3 3 3"
+          scale="5 5 5"
           camera-orbit={`45deg 55deg ${(8 - scale * 6).toFixed(2)}m`}
           min-camera-orbit="auto auto 0.5m"
-          max-camera-orbit="auto auto 12m"
+          max-camera-orbit="auto auto 20m"
           environment-image="neutral"
-          exposure="0.8"
+          exposure="1.0"
         />
       </div>
 
