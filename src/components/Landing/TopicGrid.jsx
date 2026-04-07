@@ -62,6 +62,9 @@ export default function TopicGrid() {
         transition={{ duration: 0.6 }}
         className="text-center mb-12"
       >
+        <div className="inline-block px-4 py-1.5 rounded-full mb-4" style={{ background: '#FFFFFF', border: '1px solid #90CAF9' }}>
+          <span className="text-xs font-heading font-bold text-[#1565C0] uppercase tracking-wider">📚 Topics</span>
+        </div>
         <h2 className="font-heading font-bold text-3xl md:text-4xl text-[#0D1B2A] mb-4">
           Calculus Topics
         </h2>
@@ -81,10 +84,14 @@ export default function TopicGrid() {
           >
             <Link to={`/visualize/${topic.id}`}>
               <motion.div
-                whileHover={{ scale: 1.04, y: -4 }}
+                whileHover={{ scale: 1.04, y: -4, boxShadow: '0 8px 28px rgba(21, 101, 192, 0.18)' }}
                 whileTap={{ scale: 0.96 }}
-                className="glass p-5 flex flex-col gap-3 cursor-pointer group"
-                style={{ borderColor: `${topic.color}30` }}
+                className="p-5 flex flex-col gap-3 cursor-pointer group rounded-2xl"
+                style={{
+                  background: 'linear-gradient(135deg, #FFFFFF 0%, #F0F7FF 100%)',
+                  border: `1.5px solid ${topic.color}`,
+                  boxShadow: `0 4px 20px ${topic.color}20, inset 0 1px 0 rgba(255,255,255,0.7)`,
+                }}
               >
                 <div className="flex items-start justify-between">
                   <div

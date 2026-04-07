@@ -32,21 +32,34 @@
 
 @layer components {
   .glass {
-    background: #F0F7FF;
+    background: linear-gradient(180deg, #F8FBFF 0%, #E3F2FD 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid #90CAF9;
     border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(21, 101, 192, 0.08);
+    box-shadow: 0 4px 20px rgba(21, 101, 192, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.6);
   }
 
   .glass-dark {
-    background: rgba(240, 247, 255, 0.92);
+    background: linear-gradient(180deg, #F0F7FF 0%, #BBDEFB 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    border: 1px solid #1565C0;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(21, 101, 192, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #90CAF9 50%, transparent 100%);
+    margin: 0;
+  }
+
+  .pastel-card {
+    background: linear-gradient(135deg, #F8FBFF 0%, #E3F2FD 100%);
     border: 1px solid #90CAF9;
     border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(21, 101, 192, 0.08);
+    box-shadow: 0 4px 20px rgba(21, 101, 192, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.7);
   }
 
   .btn-primary {
