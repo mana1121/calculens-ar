@@ -23,7 +23,45 @@ global.self = dom.window
 
 if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true })
 
+/**
+ * Normalize all visible meshes in a scene so the combined bounding box
+ * is centered at origin and the largest dimension equals targetMaxDim (in metres).
+ * Lights are not affected. This guarantees every exported GLB has a consistent
+ * size for stable native AR (iOS Quick Look + Android Scene Viewer).
+ */
+function normalizeScene(scene, targetMaxDim = 1.0) {
+  const box = new THREE.Box3()
+  scene.traverse((obj) => {
+    if (obj.isMesh && obj.geometry) {
+      obj.geometry.computeBoundingBox()
+      const meshBox = obj.geometry.boundingBox.clone()
+      meshBox.applyMatrix4(obj.matrixWorld)
+      box.union(meshBox)
+    }
+  })
+  if (box.isEmpty()) return
+  const size = new THREE.Vector3()
+  const center = new THREE.Vector3()
+  box.getSize(size)
+  box.getCenter(center)
+  const maxDim = Math.max(size.x, size.y, size.z)
+  if (maxDim === 0) return
+  const s = targetMaxDim / maxDim
+
+  // Apply translation + scale to every mesh
+  scene.traverse((obj) => {
+    if (obj.isMesh && obj.geometry) {
+      obj.geometry.translate(-center.x, -center.y, -center.z)
+      obj.geometry.scale(s, s, s)
+    }
+  })
+}
+
 function exportGLB(scene, filename) {
+  // Always normalize before exporting so every GLB has a 1m max dimension
+  // centered at origin — this is critical for stable AR on iOS and Android.
+  normalizeScene(scene, 1.0)
+
   return new Promise((resolve, reject) => {
     new GLTFExporter().parse(scene, (result) => {
       const buf = Buffer.from(result)
@@ -40,10 +78,10 @@ function createScene() {
   const d1 = new THREE.DirectionalLight(0xffffff, 1.5)
   d1.position.set(5, 8, 5)
   scene.add(d1)
-  const d2 = new THREE.DirectionalLight(0x667eea, 0.8)
+  const d2 = new THREE.DirectionalLight(0x1565C0, 0.8)
   d2.position.set(-5, 3, -5)
   scene.add(d2)
-  const p1 = new THREE.PointLight(0xa78bfa, 0.5)
+  const p1 = new THREE.PointLight(0x42A5F5, 0.5)
   p1.position.set(0, -3, 0)
   scene.add(p1)
   return scene
@@ -107,8 +145,8 @@ function latheModel(fn, a, b, color, scale = 1) {
 async function genParaboloid() {
   const scene = createScene()
   const geo = latheModel(x => x * x, 0, 2, null, 0.45)
-  scene.add(new THREE.Mesh(geo, makeSolidMat(0x667eea)))
-  scene.add(new THREE.Mesh(geo.clone(), makeWireMat(0xaabbff)))
+  scene.add(new THREE.Mesh(geo, makeSolidMat(0x1565C0)))
+  scene.add(new THREE.Mesh(geo.clone(), makeWireMat(0xBBDEFB)))
   addAxisHelper(scene)
   await exportGLB(scene, 'solid-of-revolution-paraboloid.glb')
 }
@@ -116,8 +154,8 @@ async function genParaboloid() {
 async function genCone() {
   const scene = createScene()
   const geo = latheModel(x => x, 0, 3, null, 0.35)
-  scene.add(new THREE.Mesh(geo, makeSolidMat(0x764ba2)))
-  scene.add(new THREE.Mesh(geo.clone(), makeWireMat(0xbb88ff)))
+  scene.add(new THREE.Mesh(geo, makeSolidMat(0x42A5F5)))
+  scene.add(new THREE.Mesh(geo.clone(), makeWireMat(0x90CAF9)))
   addAxisHelper(scene)
   await exportGLB(scene, 'solid-of-revolution-cone.glb')
 }
@@ -248,7 +286,7 @@ async function genTangentParabola() {
   const path = new THREE.CatmullRomCurve3(pts)
   scene.add(new THREE.Mesh(
     new THREE.TubeGeometry(path, 80, 0.035, 12, false),
-    new THREE.MeshStandardMaterial({ color: 0x667eea, emissive: 0x667eea, emissiveIntensity: 0.3 })
+    new THREE.MeshStandardMaterial({ color: 0x1565C0, emissive: 0x1565C0, emissiveIntensity: 0.3 })
   ))
   // Tangent at (1,1)
   const tPath = new THREE.LineCurve3(new THREE.Vector3(-0.6, -0.1, 0), new THREE.Vector3(1.0, 0.5, 0))
@@ -289,7 +327,7 @@ async function genTangentSaddle() {
   geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
   geo.setIndex(indices)
   geo.computeVertexNormals()
-  scene.add(new THREE.Mesh(geo, makeSolidMat(0x667eea)))
+  scene.add(new THREE.Mesh(geo, makeSolidMat(0x1565C0)))
   // Tangent plane
   const planeGeo = new THREE.PlaneGeometry(1.5, 1.5)
   const planeMat = new THREE.MeshStandardMaterial({ color: 0xff9800, transparent: true, opacity: 0.5, side: THREE.DoubleSide })

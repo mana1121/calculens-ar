@@ -484,7 +484,7 @@ export default function ARViewer({ selectedTopic }) {
           src={model.src}
           ar
           ar-modes="webxr scene-viewer quick-look"
-          ar-scale="auto"
+          ar-scale="fixed"
           ar-placement="floor"
           camera-controls
           touch-action="pan-y"
@@ -494,7 +494,7 @@ export default function ARViewer({ selectedTopic }) {
           rotation-per-second="12deg"
           shadow-intensity="1"
           style={{ width: '100%', height: isRevolution ? '200px' : '400px', background: 'transparent' }}
-          scale="5 5 5"
+          scale="2 2 2"
           camera-orbit={`45deg 55deg ${(8 - scale * 6).toFixed(2)}m`}
           min-camera-orbit="auto auto 0.5m"
           max-camera-orbit="auto auto 20m"
