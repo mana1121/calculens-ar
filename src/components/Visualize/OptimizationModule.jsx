@@ -81,8 +81,8 @@ export default function OptimizationModule() {
     }
 
     // f(x) curve — glow
-    ctx.strokeStyle = '#1565C0'; ctx.lineWidth = 3.5
-    ctx.shadowColor = '#1565C0'; ctx.shadowBlur = 10
+    ctx.strokeStyle = '#8B5CF6'; ctx.lineWidth = 3.5
+    ctx.shadowColor = '#8B5CF6'; ctx.shadowBlur = 14
     ctx.beginPath(); let started = false
     for (let i = 0; i <= 500; i++) {
       const x = domain[0] + (domain[1] - domain[0]) * (i / 500)
@@ -113,35 +113,35 @@ export default function OptimizationModule() {
       ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2; ctx.stroke()
 
       // Label
-      ctx.fillStyle = '#0D1B2A'; ctx.font = 'bold 12px "Space Grotesk", sans-serif'
+      ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 12px "Space Grotesk", sans-serif'
       ctx.fillText(type, cx + 18, cy - 12)
-      ctx.fillStyle = '#64748B'; ctx.font = '11px monospace'
+      ctx.fillStyle = '#9CA3AF'; ctx.font = '11px monospace'
       ctx.fillText(`(${x.toFixed(2)}, ${y.toFixed(2)})`, cx + 18, cy + 4)
     })
   }, [presetIdx, showDeriv, showIncDec, preset, domain])
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-2xl overflow-hidden border border-[#BBDEFB]"
-        style={{ background: '#FFFFFF', boxShadow: '0 2px 12px rgba(21,101,192,0.08)' }}>
+      <div className="rounded-2xl overflow-hidden border border-[#4A2D8C]"
+        style={{ background: '#0A0118', boxShadow: '0 0 24px rgba(139, 92, 246, 0.20)' }}>
         <canvas ref={canvasRef} width={W} height={H} className="w-full" style={{ maxHeight: 500 }} />
       </div>
 
-      <div className="glass p-4 rounded-2xl" style={{ background: '#E3F2FD' }}>
+      <div className="glass p-4 rounded-2xl">
         <BlockMathDisplay math={`${preset.derivLatex} = 0`} />
       </div>
 
       {/* Critical points cards */}
       <div className="glass p-4 rounded-2xl">
-        <p className="text-[#64748B] text-sm font-heading mb-3">Critical Points</p>
+        <p className="text-[#9CA3AF] text-sm font-heading mb-3">Critical Points</p>
         <div className="flex flex-wrap gap-3">
           {preset.criticals.map(({ x, type, color }) => (
             <div key={x} className="flex items-center gap-3 px-4 py-3 rounded-xl border"
-              style={{ background: `${color}10`, borderColor: color }}>
-              <div className="w-4 h-4 rounded-full" style={{ background: color }} />
+              style={{ background: `${color}15`, borderColor: color, boxShadow: `0 0 12px ${color}30` }}>
+              <div className="w-4 h-4 rounded-full" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
               <div>
-                <p className="text-[#0D1B2A] text-sm font-heading font-semibold">{type}</p>
-                <p className="text-[#64748B] text-xs font-mono">x = {x.toFixed(3)}, y = {preset.fn(x).toFixed(3)}</p>
+                <p className="text-white text-sm font-heading font-semibold">{type}</p>
+                <p className="text-[#9CA3AF] text-xs font-mono">x = {x.toFixed(3)}, y = {preset.fn(x).toFixed(3)}</p>
               </div>
             </div>
           ))}
@@ -163,9 +163,10 @@ export default function OptimizationModule() {
       <div className="flex gap-2">
         {PRESETS.map((p, i) => (
           <motion.button key={i} whileTap={{ scale: 0.95 }} onClick={() => setPresetIdx(i)}
-            className={`flex-1 py-3 rounded-xl text-sm font-mono border transition-all ${
-              presetIdx === i ? 'border-2 border-[#1565C0] bg-[#E3F2FD] text-[#1565C0]' : 'border-[#BBDEFB] bg-[#F0F7FF] text-[#64748B]'
-            }`}>
+            className="flex-1 py-3 rounded-xl text-sm font-mono border transition-all"
+            style={presetIdx === i
+              ? { background: 'rgba(139, 92, 246, 0.20)', borderColor: '#8B5CF6', borderWidth: '2px', color: '#A78BFA', boxShadow: '0 0 16px rgba(139, 92, 246, 0.30)' }
+              : { background: 'rgba(139, 92, 246, 0.05)', borderColor: 'rgba(167, 139, 250, 0.20)', color: '#9CA3AF' }}>
             {p.label}
           </motion.button>
         ))}

@@ -62,9 +62,9 @@ export default function SnapSolve() {
 
       <div className="flex-1 px-4 pb-6 overflow-y-auto">
         {error && (
-          <div className="p-4 rounded-2xl mb-4" style={{ background: '#FEF2F2', border: '1px solid #FCA5A5' }}>
-            <p className="text-red-600 text-sm">⚠️ {error}</p>
-            <p className="text-[#64748B] text-xs mt-1">Make sure ANTHROPIC_API_KEY is set in .env and the proxy server is running.</p>
+          <div className="p-4 rounded-2xl mb-4" style={{ background: 'rgba(248, 113, 113, 0.10)', border: '1px solid rgba(248, 113, 113, 0.40)' }}>
+            <p className="text-[#FCA5A5] text-sm">⚠️ {error}</p>
+            <p className="text-[#9CA3AF] text-xs mt-1">Make sure ANTHROPIC_API_KEY is set in .env and the proxy server is running.</p>
           </div>
         )}
 

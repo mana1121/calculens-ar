@@ -81,8 +81,8 @@ export default function RateOfChangeModule() {
       const cx = W / 2, cy = H / 2
       const r = Math.min(state.r * 25, 120)
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(21,101,192,0.20)'; ctx.fill()
-      ctx.strokeStyle = '#1565C0'; ctx.lineWidth = 2; ctx.stroke()
+      ctx.fillStyle = 'rgba(139, 92, 246, 0.25)'; ctx.fill()
+      ctx.strokeStyle = '#8B5CF6'; ctx.lineWidth = 2; ctx.shadowColor = '#8B5CF6'; ctx.shadowBlur = 12; ctx.stroke(); ctx.shadowBlur = 0
       ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3])
       ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + r, cy); ctx.stroke()
       ctx.setLineDash([])
@@ -108,7 +108,7 @@ export default function RateOfChangeModule() {
       const scale = 35
       const x = state.x * scale, y = state.y * scale
       // Wall
-      ctx.strokeStyle = '#0D1B2A'; ctx.lineWidth = 3
+      ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 3
       ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox, oy - 200); ctx.stroke()
       ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox + 200, oy); ctx.stroke()
       // Ladder
@@ -127,13 +127,13 @@ export default function RateOfChangeModule() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-4 items-start">
-        <div className="glass rounded-2xl overflow-hidden flex-shrink-0">
+        <div className="rounded-2xl overflow-hidden flex-shrink-0 border border-[#4A2D8C]" style={{ background: '#0A0118', boxShadow: '0 0 24px rgba(139, 92, 246, 0.20)' }}>
           <canvas ref={canvasRef} width={W} height={H} className="w-full" style={{ maxWidth: W, maxHeight: H }} />
         </div>
         <div className="flex-1 flex flex-col gap-3">
           {state.labels.map((lbl) => (
-            <div key={lbl} className="p-3 rounded-xl" style={{ background: '#F0F7FF', border: '1px solid #BBDEFB' }}>
-              <p className="font-mono text-sm text-[#1565C0]">{lbl}</p>
+            <div key={lbl} className="p-3 rounded-xl" style={{ background: 'rgba(139, 92, 246, 0.10)', border: '1px solid rgba(167, 139, 250, 0.30)' }}>
+              <p className="font-mono text-sm text-[#A78BFA]">{lbl}</p>
             </div>
           ))}
         </div>
@@ -146,10 +146,10 @@ export default function RateOfChangeModule() {
       {/* Slider */}
       <div className="glass p-4 rounded-2xl">
         <div className="flex justify-between mb-2">
-          <p className="text-[#64748B] text-xs font-heading">Time</p>
-          <p className="text-[#1565C0] text-xs font-mono">t = {t.toFixed(2)}s</p>
+          <p className="text-[#9CA3AF] text-xs font-heading">Time</p>
+          <p className="text-[#A78BFA] text-xs font-mono">t = {t.toFixed(2)}s</p>
         </div>
-        <input type="range" min={0} max={3} step={0.01} value={t} onChange={(e) => { setPlaying(false); setT(Number(e.target.value)) }} className="w-full" style={{ accentColor: '#1565C0' }} />
+        <input type="range" min={0} max={3} step={0.01} value={t} onChange={(e) => { setPlaying(false); setT(Number(e.target.value)) }} className="w-full" style={{ accentColor: '#8B5CF6' }} />
       </div>
 
       <div className="flex gap-3">
@@ -166,9 +166,10 @@ export default function RateOfChangeModule() {
             key={s.id}
             whileTap={{ scale: 0.95 }}
             onClick={() => { setScenarioIdx(i); setT(0); setPlaying(false) }}
-            className={`flex-1 py-3 px-2 rounded-xl text-xs font-heading border transition-all ${
-              scenarioIdx === i ? 'border-2 border-[#1565C0] bg-[#E3F2FD] text-[#1565C0]' : 'border-[#BBDEFB] bg-[#F0F7FF] text-[#64748B]'
-            }`}
+            className="flex-1 py-3 px-2 rounded-xl text-xs font-heading border transition-all"
+            style={scenarioIdx === i
+              ? { background: 'rgba(139, 92, 246, 0.20)', borderColor: '#8B5CF6', borderWidth: '2px', color: '#A78BFA', boxShadow: '0 0 16px rgba(139, 92, 246, 0.30)' }
+              : { background: 'rgba(139, 92, 246, 0.05)', borderColor: 'rgba(167, 139, 250, 0.20)', color: '#9CA3AF' }}
           >
             {s.icon} {s.label}
           </motion.button>

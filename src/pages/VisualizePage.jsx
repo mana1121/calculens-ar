@@ -88,7 +88,7 @@ export default function VisualizePage() {
   if (!config) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-[#64748B]">Topic not found.</p>
+        <p className="text-[#9CA3AF]">Topic not found.</p>
       </div>
     )
   }
@@ -114,8 +114,8 @@ export default function VisualizePage() {
           onClick={() => setShowQuestions((s) => !s)}
           className="w-full mt-6 py-4 rounded-2xl text-base font-heading font-semibold border transition-all flex items-center justify-center gap-2"
           style={showQuestions
-            ? { background: '#E3F2FD', borderColor: '#1565C0', borderWidth: '2px', color: '#1565C0' }
-            : { background: '#F0F7FF', borderColor: '#BBDEFB', borderWidth: '1px', color: '#1565C0' }
+            ? { background: 'rgba(139, 92, 246, 0.20)', borderColor: '#8B5CF6', borderWidth: '2px', color: '#A78BFA', boxShadow: '0 0 20px rgba(139, 92, 246, 0.30)' }
+            : { background: 'rgba(139, 92, 246, 0.05)', borderColor: 'rgba(167, 139, 250, 0.30)', borderWidth: '1px', color: '#A78BFA' }
           }
         >
           <span className="text-xl">📝</span>
@@ -143,24 +143,24 @@ export default function VisualizePage() {
                   {/* Question */}
                   <button
                     onClick={() => setExpandedQ(expandedQ === i ? null : i)}
-                    className="w-full p-5 text-left flex items-start gap-4 hover:bg-[#E3F2FD]/40 transition-colors"
+                    className="w-full p-5 text-left flex items-start gap-4 hover:bg-[#8B5CF6]/10 transition-colors"
                   >
                     <div
                       className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold font-heading text-white"
-                      style={{ background: '#1565C0' }}
+                      style={{ background: 'linear-gradient(135deg, #6B3FA0, #8B5CF6)', boxShadow: '0 0 12px rgba(139, 92, 246, 0.40)' }}
                     >
                       {i + 1}
                     </div>
                     <div className="flex-1">
-                      <p className="text-[#0D1B2A] text-sm leading-relaxed">{item.q}</p>
+                      <p className="text-[#E5E7EB] text-sm leading-relaxed">{item.q}</p>
                       <div className="flex items-center gap-2 mt-2">
                         <span
                           className="text-[10px] font-heading font-bold uppercase px-2 py-0.5 rounded-full"
-                          style={{ background: `${DIFF_COLORS[item.difficulty]}20`, color: DIFF_COLORS[item.difficulty] }}
+                          style={{ background: `${DIFF_COLORS[item.difficulty]}20`, color: DIFF_COLORS[item.difficulty], border: `1px solid ${DIFF_COLORS[item.difficulty]}40` }}
                         >
                           {item.difficulty}
                         </span>
-                        <span className="text-[#64748B] text-xs">
+                        <span className="text-[#9CA3AF] text-xs">
                           {expandedQ === i ? '▲ Hide solution' : '▼ Show solution'}
                         </span>
                       </div>
@@ -177,9 +177,9 @@ export default function VisualizePage() {
                         transition={{ duration: 0.25 }}
                         className="overflow-hidden"
                       >
-                        <div className="px-5 pb-5 pt-0 border-t border-[#BBDEFB]">
-                          <div className="mt-4 p-4 rounded-xl" style={{ background: '#E3F2FD' }}>
-                            <p className="text-[#1565C0] text-xs font-mono mb-2">Solution</p>
+                        <div className="px-5 pb-5 pt-0 border-t border-[#4A2D8C]">
+                          <div className="mt-4 p-4 rounded-xl" style={{ background: 'rgba(139, 92, 246, 0.10)', border: '1px solid rgba(167, 139, 250, 0.20)' }}>
+                            <p className="text-[#A78BFA] text-xs font-mono mb-2">Solution</p>
                             <BlockMathDisplay math={item.math} />
                           </div>
                         </div>

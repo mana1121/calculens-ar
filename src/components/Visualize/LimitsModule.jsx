@@ -57,10 +57,10 @@ export default function LimitsModule() {
     drawAxes(ctx, W, H, PAD, domain, yRange, { xLabel: 'x', yLabel: 'f(x)' })
 
     // Curve — thick, glowing
-    ctx.strokeStyle = '#1565C0'
+    ctx.strokeStyle = '#8B5CF6'
     ctx.lineWidth = 3
-    ctx.shadowColor = '#1565C0'
-    ctx.shadowBlur = 8
+    ctx.shadowColor = '#8B5CF6'
+    ctx.shadowBlur = 12
     ctx.beginPath()
     let started = false
     for (let i = 0; i <= 500; i++) {
@@ -75,7 +75,7 @@ export default function LimitsModule() {
     ctx.shadowBlur = 0
 
     // Vertical dashed line at limit point
-    ctx.strokeStyle = 'rgba(144,202,249,0.6)'
+    ctx.strokeStyle = 'rgba(196, 181, 253, 0.5)'
     ctx.lineWidth = 1; ctx.setLineDash([4, 4])
     const [lx] = toCanvas(limitAt, 0, domain, yRange)
     ctx.beginPath(); ctx.moveTo(lx, PAD); ctx.lineTo(lx, H - PAD); ctx.stroke()
@@ -98,8 +98,8 @@ export default function LimitsModule() {
       }
       ctx.stroke()
     }
-    if (yLeft !== null && Math.abs(yLeft) <= 10) drawTrail(limitAt - 1.5, xLeft, '#42A5F5', 'left')
-    if (yRight !== null && Math.abs(yRight) <= 10) drawTrail(limitAt + 1.5, xRight, '#34d399', 'right')
+    if (yLeft !== null && Math.abs(yLeft) <= 10) drawTrail(limitAt - 1.5, xLeft, '#A78BFA', 'left')
+    if (yRight !== null && Math.abs(yRight) <= 10) drawTrail(limitAt + 1.5, xRight, '#14B8A6', 'right')
 
     // Approach dots with glow
     const drawDot = (x, y, color, size) => {
@@ -111,58 +111,58 @@ export default function LimitsModule() {
       ctx.shadowBlur = 0
       ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2; ctx.stroke()
     }
-    drawDot(xLeft, yLeft, '#42A5F5', 7)
-    drawDot(xRight, yRight, '#34d399', 7)
+    drawDot(xLeft, yLeft, '#A78BFA', 7)
+    drawDot(xRight, yRight, '#14B8A6', 7)
 
     // Limit point (hollow circle)
     if (preset.limitVal !== null) {
       const [cx, cy] = toCanvas(limitAt, preset.limitVal, domain, yRange)
       ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI * 2)
-      ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2.5; ctx.stroke()
-      ctx.fillStyle = '#FFFFFF'; ctx.fill()
+      ctx.strokeStyle = '#FCD34D'; ctx.lineWidth = 2.5; ctx.stroke()
+      ctx.fillStyle = '#0A0118'; ctx.fill()
       // Label
-      ctx.fillStyle = '#f59e0b'; ctx.font = 'bold 12px monospace'
+      ctx.fillStyle = '#FCD34D'; ctx.font = 'bold 12px monospace'
       ctx.fillText(`L = ${preset.limitVal}`, cx + 14, cy - 8)
     }
   }, [presetIdx, approachX, preset, domain, xLeft, xRight, yLeft, yRight, limitAt])
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="glass rounded-2xl overflow-hidden" style={{ background: '#FFFFFF' }}>
+      <div className="rounded-2xl overflow-hidden border border-[#4A2D8C]" style={{ background: '#0A0118', boxShadow: '0 0 24px rgba(139, 92, 246, 0.20)' }}>
         <canvas ref={canvasRef} width={W} height={H} className="w-full" style={{ maxHeight: 450 }} />
       </div>
 
       {/* Limit notation */}
-      <div className="glass p-5 rounded-2xl" style={{ background: '#E3F2FD' }}>
+      <div className="glass p-5 rounded-2xl">
         <BlockMathDisplay math={`${preset.latex} = ${preset.answer}`} />
       </div>
 
       {/* Live values */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="p-4 rounded-2xl" style={{ background: '#F0F7FF', border: '1px solid #90CAF9' }}>
-          <p className="text-[#1565C0] text-xs font-mono mb-1">← Left approach</p>
-          <p className="text-[#0D1B2A] font-heading font-bold text-xl">
+        <div className="p-4 rounded-2xl" style={{ background: 'rgba(139, 92, 246, 0.10)', border: '1px solid rgba(167, 139, 250, 0.30)' }}>
+          <p className="text-[#A78BFA] text-xs font-mono mb-1">← Left approach</p>
+          <p className="text-white font-heading font-bold text-xl">
             {yLeft !== null ? yLeft.toFixed(6) : '±∞'}
           </p>
-          <p className="text-[#64748B] text-xs font-mono">x = {xLeft.toFixed(6)}</p>
+          <p className="text-[#9CA3AF] text-xs font-mono">x = {xLeft.toFixed(6)}</p>
         </div>
-        <div className="p-4 rounded-2xl" style={{ background: '#F0FDF4', border: '1px solid #34D399' }}>
-          <p className="text-emerald-600 text-xs font-mono mb-1">Right approach →</p>
-          <p className="text-[#0D1B2A] font-heading font-bold text-xl">
+        <div className="p-4 rounded-2xl" style={{ background: 'rgba(20, 184, 166, 0.10)', border: '1px solid rgba(94, 234, 212, 0.30)' }}>
+          <p className="text-[#5EEAD4] text-xs font-mono mb-1">Right approach →</p>
+          <p className="text-white font-heading font-bold text-xl">
             {yRight !== null ? yRight.toFixed(6) : '±∞'}
           </p>
-          <p className="text-[#64748B] text-xs font-mono">x = {xRight.toFixed(6)}</p>
+          <p className="text-[#9CA3AF] text-xs font-mono">x = {xRight.toFixed(6)}</p>
         </div>
       </div>
 
       {/* Approach slider */}
       <div className="glass p-4 rounded-2xl">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-[#64748B] text-sm font-heading">Distance from x = {limitAt}</p>
-          <p className="text-[#1565C0] text-sm font-mono font-bold">δ = {approachX.toFixed(4)}</p>
+          <p className="text-[#9CA3AF] text-sm font-heading">Distance from x = {limitAt}</p>
+          <p className="text-[#A78BFA] text-sm font-mono font-bold">δ = {approachX.toFixed(4)}</p>
         </div>
         <input type="range" min={0.001} max={1.5} step={0.001} value={approachX}
-          onChange={(e) => { setAutoAnimate(false); setApproachX(Number(e.target.value)) }} className="w-full" style={{ accentColor: '#1565C0' }} />
+          onChange={(e) => { setAutoAnimate(false); setApproachX(Number(e.target.value)) }} className="w-full" style={{ accentColor: '#8B5CF6' }} />
       </div>
 
       {/* Controls */}
@@ -175,14 +175,15 @@ export default function LimitsModule() {
 
       {/* Presets */}
       <div className="glass p-4 rounded-2xl">
-        <p className="text-[#64748B] text-sm font-heading mb-3">Select Function</p>
+        <p className="text-[#9CA3AF] text-sm font-heading mb-3">Select Function</p>
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((p, i) => (
             <motion.button key={i} whileTap={{ scale: 0.95 }}
               onClick={() => { setPresetIdx(i); setApproachX(0.5); setAutoAnimate(false) }}
-              className={`px-4 py-3 rounded-xl text-sm font-mono border transition-all ${
-                presetIdx === i ? 'border-2 border-[#1565C0] bg-[#E3F2FD] text-[#1565C0]' : 'border-[#BBDEFB] bg-[#F0F7FF] text-[#64748B] hover:border-[#90CAF9]'
-              }`}>
+              className={`px-4 py-3 rounded-xl text-sm font-mono border transition-all`}
+              style={presetIdx === i
+                ? { background: 'rgba(139, 92, 246, 0.20)', borderColor: '#8B5CF6', borderWidth: '2px', color: '#A78BFA', boxShadow: '0 0 16px rgba(139, 92, 246, 0.30)' }
+                : { background: 'rgba(139, 92, 246, 0.05)', borderColor: 'rgba(167, 139, 250, 0.20)', color: '#9CA3AF' }}>
               {p.label}
             </motion.button>
           ))}

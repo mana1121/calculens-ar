@@ -8,7 +8,7 @@ const topics = [
     title: 'Limits',
     subtitle: 'Calculus I',
     desc: 'Explore left/right limits and continuity',
-    color: '#1565C0',
+    color: '#8B5CF6',
   },
   {
     id: 'derivatives',
@@ -16,7 +16,7 @@ const topics = [
     title: 'Derivatives',
     subtitle: 'Calculus I',
     desc: 'Tangent lines and rate of change',
-    color: '#42A5F5',
+    color: '#A78BFA',
   },
   {
     id: 'integration',
@@ -24,7 +24,7 @@ const topics = [
     title: 'Integration',
     subtitle: 'Calculus I & II',
     desc: 'Area under curves and Riemann sums',
-    color: '#34d399',
+    color: '#14B8A6',
   },
   {
     id: 'solid-of-revolution',
@@ -32,7 +32,7 @@ const topics = [
     title: 'Solid of Revolution',
     subtitle: 'Calculus II',
     desc: '3D solids formed by rotating curves',
-    color: '#f59e0b',
+    color: '#C4B5FD',
   },
   {
     id: 'optimization',
@@ -40,7 +40,7 @@ const topics = [
     title: 'Optimization',
     subtitle: 'Calculus I & II',
     desc: 'Find maxima and minima visually',
-    color: '#f87171',
+    color: '#2DD4BF',
   },
   {
     id: 'rate-of-change',
@@ -48,7 +48,7 @@ const topics = [
     title: 'Rate of Change',
     subtitle: 'Calculus II',
     desc: 'Related rates with real-world scenarios',
-    color: '#38bdf8',
+    color: '#5EEAD4',
   },
 ]
 
@@ -62,13 +62,13 @@ export default function TopicGrid() {
         transition={{ duration: 0.6 }}
         className="text-center mb-12"
       >
-        <div className="inline-block px-4 py-1.5 rounded-full mb-4" style={{ background: '#FFFFFF', border: '1px solid #90CAF9' }}>
-          <span className="text-xs font-heading font-bold text-[#1565C0] uppercase tracking-wider">📚 Topics</span>
+        <div className="inline-block px-4 py-1.5 rounded-full mb-4" style={{ background: 'rgba(20, 184, 166, 0.10)', border: '1px solid rgba(94, 234, 212, 0.30)' }}>
+          <span className="text-xs font-heading font-bold text-[#5EEAD4] uppercase tracking-wider">📚 Topics</span>
         </div>
-        <h2 className="font-heading font-bold text-3xl md:text-4xl text-[#0D1B2A] mb-4">
+        <h2 className="font-heading font-bold text-3xl md:text-4xl text-white mb-4">
           Calculus Topics
         </h2>
-        <p className="text-[#64748B] text-lg max-w-xl mx-auto">
+        <p className="text-[#9CA3AF] text-lg max-w-xl mx-auto">
           All major calculus topics covered with interactive 3D visualizations
         </p>
       </motion.div>
@@ -84,29 +84,27 @@ export default function TopicGrid() {
           >
             <Link to={`/visualize/${topic.id}`}>
               <motion.div
-                whileHover={{ scale: 1.04, y: -4, boxShadow: '0 8px 28px rgba(21, 101, 192, 0.18)' }}
+                whileHover={{ scale: 1.04, y: -4, boxShadow: `0 8px 32px ${topic.color}40` }}
                 whileTap={{ scale: 0.96 }}
-                className="p-5 flex flex-col gap-3 cursor-pointer group rounded-2xl"
+                className="p-5 flex flex-col gap-3 cursor-pointer group rounded-2xl glass-card"
                 style={{
-                  background: 'linear-gradient(135deg, #FFFFFF 0%, #F0F7FF 100%)',
-                  border: `1.5px solid ${topic.color}`,
-                  boxShadow: `0 4px 20px ${topic.color}20, inset 0 1px 0 rgba(255,255,255,0.7)`,
+                  borderColor: `${topic.color}40`,
                 }}
               >
                 <div className="flex items-start justify-between">
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-mono font-bold"
-                    style={{ background: `${topic.color}20`, color: topic.color }}
+                    style={{ background: `${topic.color}20`, color: topic.color, boxShadow: `0 0 16px ${topic.color}30` }}
                   >
                     {topic.icon}
                   </div>
-                  <span className="text-[10px] font-mono text-[#1565C0] px-2 py-1 rounded-full" style={{ background: '#E3F2FD', border: '1px solid #BBDEFB' }}>
+                  <span className="text-[10px] font-mono px-2 py-1 rounded-full" style={{ background: `${topic.color}15`, border: `1px solid ${topic.color}40`, color: topic.color }}>
                     {topic.subtitle}
                   </span>
                 </div>
                 <div>
-                  <h3 className="font-heading font-semibold text-[#0D1B2A] text-sm">{topic.title}</h3>
-                  <p className="text-[#64748B] text-xs leading-relaxed mt-1">{topic.desc}</p>
+                  <h3 className="font-heading font-semibold text-white text-sm">{topic.title}</h3>
+                  <p className="text-[#9CA3AF] text-xs leading-relaxed mt-1">{topic.desc}</p>
                 </div>
                 <div
                   className="text-xs font-heading font-semibold opacity-0 group-hover:opacity-100 transition-opacity"

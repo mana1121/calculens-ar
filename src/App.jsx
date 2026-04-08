@@ -11,7 +11,7 @@ import Formulas from './pages/Formulas.jsx'
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-white pb-24 md:pb-0">
+      <div className="min-h-screen bg-bg-base pb-24 md:pb-0">
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<Landing />} />

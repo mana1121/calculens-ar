@@ -70,8 +70,8 @@ export default function DerivativesModule() {
     }
 
     // f(x) curve — thick glow
-    ctx.strokeStyle = '#1565C0'; ctx.lineWidth = 3.5
-    ctx.shadowColor = '#1565C0'; ctx.shadowBlur = 10
+    ctx.strokeStyle = '#8B5CF6'; ctx.lineWidth = 3.5
+    ctx.shadowColor = '#8B5CF6'; ctx.shadowBlur = 14
     ctx.beginPath()
     let started = false
     for (let i = 0; i <= 500; i++) {
@@ -105,37 +105,37 @@ export default function DerivativesModule() {
     ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2.5; ctx.stroke()
 
     // Slope label near point
-    ctx.fillStyle = '#0D1B2A'; ctx.font = 'bold 13px monospace'
+    ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 13px monospace'
     ctx.fillText(`m = ${slope.toFixed(2)}`, pcx + 16, pcy - 16)
   }, [presetIdx, pointX, showDeriv, preset, domain, slope, fy])
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-2xl overflow-hidden border border-[#BBDEFB]"
-        style={{ background: '#FFFFFF', boxShadow: '0 2px 12px rgba(21,101,192,0.08)' }}>
+      <div className="rounded-2xl overflow-hidden border border-[#4A2D8C]"
+        style={{ background: '#0A0118', boxShadow: '0 0 24px rgba(139, 92, 246, 0.20)' }}>
         <canvas ref={canvasRef} width={W} height={H} className="w-full" style={{ maxHeight: 500 }} />
       </div>
 
       {/* Slope display */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="glass p-4 rounded-2xl" style={{ background: '#E3F2FD' }}>
+        <div className="glass p-4 rounded-2xl">
           <BlockMathDisplay math={preset.derivLatex} />
         </div>
         <div className="glass p-4 rounded-2xl flex flex-col items-end justify-center">
-          <p className="text-[#64748B] text-xs font-mono">Slope at x = {pointX.toFixed(2)}</p>
-          <p className="font-heading font-bold text-3xl text-amber-500">{slope.toFixed(3)}</p>
-          <p className="text-[#64748B] text-xs font-mono">f({pointX.toFixed(2)}) = {fy.toFixed(3)}</p>
+          <p className="text-[#9CA3AF] text-xs font-mono">Slope at x = {pointX.toFixed(2)}</p>
+          <p className="font-heading font-bold text-3xl text-[#FCD34D]">{slope.toFixed(3)}</p>
+          <p className="text-[#9CA3AF] text-xs font-mono">f({pointX.toFixed(2)}) = {fy.toFixed(3)}</p>
         </div>
       </div>
 
       {/* Slider */}
       <div className="glass p-4 rounded-2xl">
         <div className="flex justify-between mb-2">
-          <p className="text-[#64748B] text-sm font-heading">Move point along curve</p>
-          <p className="text-amber-500 text-sm font-mono font-bold">x = {pointX.toFixed(2)}</p>
+          <p className="text-[#9CA3AF] text-sm font-heading">Move point along curve</p>
+          <p className="text-[#FCD34D] text-sm font-mono font-bold">x = {pointX.toFixed(2)}</p>
         </div>
         <input type="range" min={domain[0] + 0.15} max={domain[1] - 0.15} step={0.02} value={pointX}
-          onChange={(e) => { setSweeping(false); setPointX(Number(e.target.value)) }} className="w-full" style={{ accentColor: '#f59e0b' }} />
+          onChange={(e) => { setSweeping(false); setPointX(Number(e.target.value)) }} className="w-full" style={{ accentColor: '#F59E0B' }} />
       </div>
 
       {/* Controls */}
@@ -154,9 +154,10 @@ export default function DerivativesModule() {
         {PRESETS.map((p, i) => (
           <motion.button key={i} whileTap={{ scale: 0.95 }}
             onClick={() => { setPresetIdx(i); setPointX(0); setSweeping(false) }}
-            className={`flex-1 py-3 rounded-xl text-sm font-mono border transition-all ${
-              presetIdx === i ? 'border-2 border-[#1565C0] bg-[#E3F2FD] text-[#1565C0]' : 'border-[#BBDEFB] bg-[#F0F7FF] text-[#64748B]'
-            }`}>
+            className="flex-1 py-3 rounded-xl text-sm font-mono border transition-all"
+            style={presetIdx === i
+              ? { background: 'rgba(139, 92, 246, 0.20)', borderColor: '#8B5CF6', borderWidth: '2px', color: '#A78BFA', boxShadow: '0 0 16px rgba(139, 92, 246, 0.30)' }
+              : { background: 'rgba(139, 92, 246, 0.05)', borderColor: 'rgba(167, 139, 250, 0.20)', color: '#9CA3AF' }}>
             {p.label}
           </motion.button>
         ))}

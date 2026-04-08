@@ -89,8 +89,8 @@ export default function IntegrationModule() {
     }
 
     // Curve — thick glow
-    ctx.strokeStyle = '#1565C0'; ctx.lineWidth = 3
-    ctx.shadowColor = '#1565C0'; ctx.shadowBlur = 8
+    ctx.strokeStyle = '#8B5CF6'; ctx.lineWidth = 3
+    ctx.shadowColor = '#8B5CF6'; ctx.shadowBlur = 12
     ctx.beginPath()
     let started = false
     for (let i = 0; i <= 500; i++) {
@@ -105,7 +105,7 @@ export default function IntegrationModule() {
     ctx.shadowBlur = 0
 
     // Filled area under curve (subtle)
-    ctx.fillStyle = 'rgba(21,101,192,0.10)'
+    ctx.fillStyle = 'rgba(139, 92, 246, 0.15)'
     ctx.beginPath()
     const [startX, startY] = toCanvas(a, 0, domain, yRange)
     ctx.moveTo(startX, startY)
@@ -122,41 +122,41 @@ export default function IntegrationModule() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="glass rounded-2xl overflow-hidden" style={{ background: '#FFFFFF' }}>
+      <div className="rounded-2xl overflow-hidden border border-[#4A2D8C]" style={{ background: '#0A0118', boxShadow: '0 0 24px rgba(139, 92, 246, 0.20)' }}>
         <canvas ref={canvasRef} width={W} height={H} className="w-full" style={{ maxHeight: 450 }} />
       </div>
 
       {/* Area values */}
       <div className="grid grid-cols-3 gap-3">
         <div className="glass p-4 rounded-2xl">
-          <p className="text-[#64748B] text-xs font-mono mb-1">Riemann ({method})</p>
-          <p className="font-heading font-bold text-xl text-emerald-600">{approx.toFixed(4)}</p>
+          <p className="text-[#9CA3AF] text-xs font-mono mb-1">Riemann ({method})</p>
+          <p className="font-heading font-bold text-xl text-[#5EEAD4]">{approx.toFixed(4)}</p>
         </div>
         <div className="glass p-4 rounded-2xl">
-          <p className="text-[#64748B] text-xs font-mono mb-1">Exact Value</p>
-          <p className="font-heading font-bold text-xl text-[#1565C0]">{preset.exactVal.toFixed(4)}</p>
+          <p className="text-[#9CA3AF] text-xs font-mono mb-1">Exact Value</p>
+          <p className="font-heading font-bold text-xl text-[#A78BFA]">{preset.exactVal.toFixed(4)}</p>
         </div>
         <div className="glass p-4 rounded-2xl">
-          <p className="text-[#64748B] text-xs font-mono mb-1">Error</p>
-          <p className={`font-heading font-bold text-xl ${errorPct < 1 ? 'text-emerald-600' : errorPct < 5 ? 'text-amber-500' : 'text-red-500'}`}>
+          <p className="text-[#9CA3AF] text-xs font-mono mb-1">Error</p>
+          <p className={`font-heading font-bold text-xl ${errorPct < 1 ? 'text-[#5EEAD4]' : errorPct < 5 ? 'text-[#FCD34D]' : 'text-[#FCA5A5]'}`}>
             {errorPct.toFixed(2)}%
           </p>
         </div>
       </div>
 
       {/* Formula */}
-      <div className="glass p-4 rounded-2xl" style={{ background: '#E3F2FD' }}>
+      <div className="glass p-4 rounded-2xl">
         <BlockMathDisplay math={`\\int_{${a}}^{${Number(b).toFixed(2)}} ${preset.latex}\\,dx = ${preset.exact} \\approx ${preset.exactVal.toFixed(4)}`} />
       </div>
 
       {/* n slider */}
       <div className="glass p-4 rounded-2xl">
         <div className="flex justify-between mb-2">
-          <p className="text-[#64748B] text-sm font-heading">Rectangles (n)</p>
-          <p className="text-emerald-600 text-sm font-mono font-bold">n = {n}</p>
+          <p className="text-[#9CA3AF] text-sm font-heading">Rectangles (n)</p>
+          <p className="text-[#5EEAD4] text-sm font-mono font-bold">n = {n}</p>
         </div>
         <input type="range" min={1} max={100} step={1} value={n}
-          onChange={(e) => { setAutoAnimate(false); setN(Number(e.target.value)) }} className="w-full" style={{ accentColor: '#10b981' }} />
+          onChange={(e) => { setAutoAnimate(false); setN(Number(e.target.value)) }} className="w-full" style={{ accentColor: '#14B8A6' }} />
       </div>
 
       {/* Controls */}
@@ -167,9 +167,10 @@ export default function IntegrationModule() {
         </button>
         {['left', 'midpoint', 'right'].map((m) => (
           <motion.button key={m} whileTap={{ scale: 0.95 }} onClick={() => setMethod(m)}
-            className={`flex-1 py-3 rounded-xl text-sm font-heading font-semibold border transition-all ${
-              method === m ? 'border-2 border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-[#BBDEFB] bg-[#F0F7FF] text-[#64748B]'
-            }`}>
+            className="flex-1 py-3 rounded-xl text-sm font-heading font-semibold border transition-all"
+            style={method === m
+              ? { background: 'rgba(20, 184, 166, 0.20)', borderColor: '#14B8A6', borderWidth: '2px', color: '#5EEAD4', boxShadow: '0 0 16px rgba(20, 184, 166, 0.30)' }
+              : { background: 'rgba(139, 92, 246, 0.05)', borderColor: 'rgba(167, 139, 250, 0.20)', color: '#9CA3AF' }}>
             {m.charAt(0).toUpperCase() + m.slice(1)}
           </motion.button>
         ))}
@@ -179,9 +180,10 @@ export default function IntegrationModule() {
       <div className="flex flex-wrap gap-2">
         {PRESETS.map((p, i) => (
           <motion.button key={i} whileTap={{ scale: 0.95 }} onClick={() => { setPresetIdx(i); setN(5) }}
-            className={`px-4 py-2 rounded-xl text-sm font-mono border transition-all ${
-              presetIdx === i ? 'border-2 border-[#1565C0] bg-[#E3F2FD] text-[#1565C0]' : 'border-[#BBDEFB] bg-[#F0F7FF] text-[#64748B]'
-            }`}>
+            className="px-4 py-2 rounded-xl text-sm font-mono border transition-all"
+            style={presetIdx === i
+              ? { background: 'rgba(139, 92, 246, 0.20)', borderColor: '#8B5CF6', borderWidth: '2px', color: '#A78BFA', boxShadow: '0 0 16px rgba(139, 92, 246, 0.30)' }
+              : { background: 'rgba(139, 92, 246, 0.05)', borderColor: 'rgba(167, 139, 250, 0.20)', color: '#9CA3AF' }}>
             {p.label}
           </motion.button>
         ))}

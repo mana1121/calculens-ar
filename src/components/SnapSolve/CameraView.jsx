@@ -68,9 +68,9 @@ export default function CameraView({ onCapture }) {
         />
 
         {!cameraActive && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4" style={{ background: 'rgba(240,247,255,0.92)' }}>
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4" style={{ background: 'rgba(26, 11, 46, 0.92)' }}>
             <div className="text-5xl">📸</div>
-            <p className="font-heading text-[#0D1B2A] text-sm text-center px-6">
+            <p className="font-heading text-[#E5E7EB] text-sm text-center px-6">
               Point at your calculus question and snap!
             </p>
             <motion.button
@@ -112,8 +112,8 @@ export default function CameraView({ onCapture }) {
       </div>
 
       {error && (
-        <div className="p-3 rounded-xl mb-4" style={{ background: '#FEF2F2', border: '1px solid #FCA5A5' }}>
-          <p className="text-red-600 text-sm text-center">{error}</p>
+        <div className="p-3 rounded-xl mb-4" style={{ background: 'rgba(248, 113, 113, 0.10)', border: '1px solid rgba(248, 113, 113, 0.40)' }}>
+          <p className="text-[#FCA5A5] text-sm text-center">{error}</p>
         </div>
       )}
 
@@ -132,7 +132,7 @@ export default function CameraView({ onCapture }) {
               whileTap={{ scale: 0.9 }}
               onClick={capturePhoto}
               className="w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-glow-lg"
-              style={{ background: '#1565C0' }}
+              style={{ background: 'linear-gradient(135deg, #6B3FA0, #8B5CF6)', boxShadow: '0 0 30px rgba(139, 92, 246, 0.55)' }}
             >
               📷
             </motion.button>

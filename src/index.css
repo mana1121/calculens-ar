@@ -30,10 +30,6 @@
   --text-secondary: #E5E7EB;
   --text-tertiary: #9CA3AF;
   --text-muted: #6B7280;
-
-  /* Existing blue theme (preserved for Phase 1) */
-  --color-primary: #1565C0;
-  --color-accent: #42A5F5;
 }
 
 @layer base {
@@ -61,7 +57,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', sans-serif;
-    color: #0D1B2A;
+    color: #FFFFFF;
   }
 
   code, .math {
@@ -71,38 +67,38 @@
 
 @layer components {
   .glass {
-    background: linear-gradient(180deg, #F8FBFF 0%, #E3F2FD 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid #90CAF9;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.10), rgba(74, 45, 140, 0.05));
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(167, 139, 250, 0.18);
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(21, 101, 192, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .glass-dark {
-    background: linear-gradient(180deg, #F0F7FF 0%, #BBDEFB 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid #1565C0;
+    background: linear-gradient(135deg, rgba(36, 16, 57, 0.85), rgba(26, 11, 46, 0.85));
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(139, 92, 246, 0.25);
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(21, 101, 192, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .section-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, #90CAF9 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, #8B5CF6 50%, transparent 100%);
     margin: 0;
   }
 
   .pastel-card {
-    background: linear-gradient(135deg, #F8FBFF 0%, #E3F2FD 100%);
-    border: 1px solid #90CAF9;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.10), rgba(74, 45, 140, 0.05));
+    border: 1px solid rgba(167, 139, 250, 0.20);
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(21, 101, 192, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .btn-primary {
-    background: #1565C0;
+    background: linear-gradient(135deg, #6B3FA0 0%, #8B5CF6 100%);
     color: #FFFFFF;
     padding: 12px 24px;
     border-radius: 12px;
@@ -111,12 +107,12 @@
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 12px rgba(21, 101, 192, 0.20);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.35), 0 0 40px rgba(139, 92, 246, 0.20);
   }
 
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(21, 101, 192, 0.25);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.55), 0 0 60px rgba(139, 92, 246, 0.30);
   }
 
   .btn-primary:active {
@@ -124,25 +120,27 @@
   }
 
   .btn-secondary {
-    background: #FFFFFF;
-    color: #1565C0;
+    background: rgba(139, 92, 246, 0.10);
+    color: #C4B5FD;
     padding: 12px 24px;
     border-radius: 12px;
     font-weight: 600;
     font-family: 'Space Grotesk', sans-serif;
-    border: 1.5px solid #1565C0;
+    border: 1.5px solid rgba(167, 139, 250, 0.40);
     cursor: pointer;
     transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
   }
 
   .btn-secondary:hover {
-    background: #E3F2FD;
+    background: rgba(139, 92, 246, 0.20);
+    border-color: rgba(167, 139, 250, 0.70);
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(21, 101, 192, 0.14);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.30);
   }
 
   .glow-text {
-    text-shadow: 0 0 20px rgba(21, 101, 192, 0.30);
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.60), 0 0 40px rgba(139, 92, 246, 0.30);
   }
 
   /* ─── PITRAM Phase 1 Foundation Utilities ─────────────────────────── */
@@ -166,18 +164,18 @@
 
 /* model-viewer AR button — keep visible on mobile */
 model-viewer::part(default-ar-button) {
-  background: #1565C0;
+  background: linear-gradient(135deg, #6B3FA0 0%, #8B5CF6 100%);
   color: #FFFFFF;
   border: none;
   border-radius: 12px;
   padding: 12px 24px;
   font-weight: 700;
   font-family: 'Space Grotesk', sans-serif;
-  box-shadow: 0 4px 16px rgba(21, 101, 192, 0.20);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.40);
 }
 
 .ar-button {
-  background: #1565C0;
+  background: linear-gradient(135deg, #6B3FA0 0%, #8B5CF6 100%);
   color: #FFFFFF;
   border: none;
   padding: 14px 28px;
@@ -186,14 +184,14 @@ model-viewer::part(default-ar-button) {
   font-size: 16px;
   font-family: 'Space Grotesk', sans-serif;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(21, 101, 192, 0.25);
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.50);
   margin-top: 16px;
 }
 
 /* KaTeX overrides */
 .katex {
   font-size: 1.1em;
-  color: #0D1B2A;
+  color: #E5E7EB;
 }
 
 .katex-display {
@@ -205,12 +203,12 @@ model-viewer::part(default-ar-button) {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F0F7FF;
+  background: #1A0B2E;
 }
 ::-webkit-scrollbar-thumb {
-  background: #90CAF9;
+  background: #6B3FA0;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #1565C0;
+  background: #8B5CF6;
 }

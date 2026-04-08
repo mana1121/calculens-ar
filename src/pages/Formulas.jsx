@@ -7,7 +7,7 @@ const CATEGORIES = [
   {
     name: 'Limits',
     icon: '→',
-    color: '#1565C0',
+    color: '#8B5CF6',
     formulas: [
       { title: 'Limit Definition', math: '\\lim_{x \\to a} f(x) = L' },
       { title: "L'Hôpital's Rule", math: "\\lim_{x \\to a} \\frac{f(x)}{g(x)} = \\lim_{x \\to a} \\frac{f'(x)}{g'(x)}" },
@@ -19,7 +19,7 @@ const CATEGORIES = [
   {
     name: 'Derivatives',
     icon: "f'",
-    color: '#42A5F5',
+    color: '#A78BFA',
     formulas: [
       { title: 'Power Rule', math: '\\frac{d}{dx} x^n = nx^{n-1}' },
       { title: 'Product Rule', math: '(fg)\' = f\'g + fg\'' },
@@ -32,7 +32,7 @@ const CATEGORIES = [
   {
     name: 'Integration',
     icon: '∫',
-    color: '#34d399',
+    color: '#14B8A6',
     formulas: [
       { title: 'Power Rule', math: '\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + C, \\quad n \\neq -1' },
       { title: 'Fundamental Theorem', math: '\\int_a^b f(x)\\,dx = F(b) - F(a)' },
@@ -84,8 +84,8 @@ export default function Formulas() {
                   : 'border'
               }`}
               style={activeCategory === i
-                ? { background: `${cat.color}20`, borderColor: cat.color, color: cat.color }
-                : { background: '#F0F7FF', borderColor: '#BBDEFB', color: '#64748B' }}
+                ? { background: `${cat.color}20`, borderColor: cat.color, color: cat.color, boxShadow: `0 0 16px ${cat.color}30` }
+                : { background: 'rgba(139, 92, 246, 0.05)', borderColor: 'rgba(167, 139, 250, 0.20)', color: '#9CA3AF' }}
             >
               <span className="font-mono">{cat.icon}</span>
               {cat.name}
@@ -104,7 +104,7 @@ export default function Formulas() {
               className="glass p-5 rounded-2xl"
               style={{ borderLeft: `3px solid ${CATEGORIES[activeCategory].color}` }}
             >
-              <p className="text-[#1565C0] text-xs font-heading font-semibold mb-3 uppercase tracking-wider">
+              <p className="text-[#A78BFA] text-xs font-heading font-semibold mb-3 uppercase tracking-wider">
                 {formula.title}
               </p>
               <BlockMathDisplay math={formula.math} />

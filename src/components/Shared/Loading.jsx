@@ -29,17 +29,17 @@ export default function Loading({ message, fullScreen = false }) {
       {/* Animated rings */}
       <div className="relative w-20 h-20">
         <motion.div
-          className="absolute inset-0 rounded-full border-2 border-[#BBDEFB]"
+          className="absolute inset-0 rounded-full border-2 border-[#4A2D8C]"
           animate={{ scale: [1, 1.5, 1], opacity: [1, 0, 1] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute inset-2 rounded-full border-2 border-[#42A5F5]"
+          className="absolute inset-2 rounded-full border-2 border-[#A78BFA]"
           animate={{ rotate: 360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
         />
         <motion.div
-          className="absolute inset-4 rounded-full border-2 border-t-[#1565C0] border-transparent"
+          className="absolute inset-4 rounded-full border-2 border-t-[#8B5CF6] border-transparent"
           animate={{ rotate: -360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         />
@@ -55,7 +55,7 @@ export default function Loading({ message, fullScreen = false }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.3 }}
-          className="text-[#1565C0] font-heading text-sm text-center max-w-xs"
+          className="text-[#A78BFA] font-heading text-sm text-center max-w-xs"
         >
           {displayMsg}
         </motion.p>
@@ -65,7 +65,7 @@ export default function Loading({ message, fullScreen = false }) {
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-[#0A0118]/90 backdrop-blur-sm flex items-center justify-center z-50">
         {content}
       </div>
     )

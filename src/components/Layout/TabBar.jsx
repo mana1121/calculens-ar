@@ -13,7 +13,7 @@ export default function TabBar() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 md:hidden z-50">
-      <div className="glass-dark border-t border-[#BBDEFB] flex items-center justify-around px-2 py-2 safe-area-bottom">
+      <div className="glass-dark border-t border-[#4A2D8C] flex items-center justify-around px-2 py-2 safe-area-bottom">
         {tabs.map((tab) => {
           const isActive = tab.path === '/'
             ? location.pathname === '/'
@@ -34,7 +34,7 @@ export default function TabBar() {
               </motion.div>
               <span
                 className={`text-xs font-heading font-medium transition-colors ${
-                  isActive ? 'text-[#1565C0]' : 'text-[#64748B]'
+                  isActive ? 'text-[#A78BFA]' : 'text-[#9CA3AF]'
                 }`}
               >
                 {tab.label}
@@ -42,7 +42,7 @@ export default function TabBar() {
               {isActive && (
                 <motion.div
                   layoutId="tab-indicator"
-                  className="absolute bottom-0 w-1 h-1 rounded-full bg-[#1565C0]"
+                  className="absolute bottom-0 w-1 h-1 rounded-full bg-[#A78BFA]"
                 />
               )}
             </NavLink>
