@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── PITRAM Premium Purple Design Tokens ─────────────────────────── */
+:root {
+  /* Background Layer */
+  --bg-base: #0A0118;
+  --bg-deep: #1A0B2E;
+  --bg-card: #241039;
+
+  /* Purple Spectrum (Brand Primary) */
+  --purple-900: #2D1B5E;
+  --purple-800: #3D2470;
+  --purple-700: #4A2D8C;
+  --purple-600: #5B36A8;
+  --purple-500: #6B3FA0;
+  --purple-400: #8B5CF6;
+  --purple-300: #A78BFA;
+  --purple-200: #C4B5FD;
+  --purple-100: #DDD6FE;
+
+  /* Cyan Accent */
+  --cyan-glow: #14B8A6;
+  --cyan-bright: #2DD4BF;
+  --cyan-mint: #5EEAD4;
+
+  /* Text Colors */
+  --text-primary: #FFFFFF;
+  --text-secondary: #E5E7EB;
+  --text-tertiary: #9CA3AF;
+  --text-muted: #6B7280;
+
+  /* Existing blue theme (preserved for Phase 1) */
+  --color-primary: #1565C0;
+  --color-accent: #42A5F5;
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -13,11 +47,16 @@
     padding: 0;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    background: #FFFFFF;
-    color: #0D1B2A;
+    background: #0A0118;
+    color: #E5E7EB;
     font-family: system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
+    font-feature-settings: "cv11", "ss01", "ss03";
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -104,6 +143,24 @@
 
   .glow-text {
     text-shadow: 0 0 20px rgba(21, 101, 192, 0.30);
+  }
+
+  /* ─── PITRAM Phase 1 Foundation Utilities ─────────────────────────── */
+
+  .noise-texture {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  .glass-card {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.10), rgba(74, 45, 140, 0.05));
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(167, 139, 250, 0.18);
+    border-radius: 16px;
   }
 }
 
