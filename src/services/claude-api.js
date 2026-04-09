@@ -107,7 +107,60 @@ Only include <viz> when visualization would genuinely help. Never include it for
 ✓ Name the rule/method by its standard name
 ✓ Use $\\frac{d}{dx}$ and $\\int$ correctly`
 
-export async function sendChatMessage(messages) {
+// Keep Render awake — ping every 4 min to prevent cold start
+setInterval(() => {
+  fetch(`${API_URL}/api/health`).catch(() => {})
+}, 240000)
+// Also ping immediately on page load
+fetch(`${API_URL}/api/health`).catch(() => {})
+
+/**
+ * Send a chat message with STREAMING — tokens appear as they arrive.
+ * @param {Array} messages - conversation history
+ * @param {Function} onToken - called with each text chunk as it streams in
+ * @returns {Promise<string>} - the complete response text
+ */
+export async function sendChatMessage(messages, onToken) {
+  // If onToken callback provided, use streaming
+  if (onToken) {
+    const res = await fetch(`${API_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages, system: CHAT_SYSTEM, stream: true }),
+    })
+    if (!res.ok) throw new Error(`API error: ${res.status}`)
+
+    const reader = res.body.getReader()
+    const decoder = new TextDecoder()
+    let fullText = ''
+    let buffer = ''
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      buffer = lines.pop() // keep incomplete line in buffer
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue
+        const data = line.slice(6)
+        if (data === '[DONE]') continue
+        try {
+          const parsed = JSON.parse(data)
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            fullText += parsed.delta.text
+            onToken(fullText)
+          }
+        } catch { /* skip non-JSON lines */ }
+      }
+    }
+
+    return fullText
+  }
+
+  // Fallback: non-streaming
   const res = await fetch(`${API_URL}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

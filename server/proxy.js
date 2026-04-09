@@ -15,11 +15,58 @@ const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages'
 const MODEL = 'claude-haiku-4-5-20251001'
 const API_KEY = (process.env.ANTHROPIC_API_KEY || '').replace(/[\r\n\s]/g, '')
 
-// Chat endpoint
+// Keep-alive endpoint — ping this to prevent Render cold starts
+app.get('/api/health', (req, res) => res.json({ ok: true }))
+
+// Chat endpoint — STREAMING via Server-Sent Events
 app.post('/api/chat', async (req, res) => {
   try {
-    const { messages, system } = req.body
+    const { messages, system, stream } = req.body
 
+    // If streaming requested, use SSE
+    if (stream) {
+      res.setHeader('Content-Type', 'text/event-stream')
+      res.setHeader('Cache-Control', 'no-cache')
+      res.setHeader('Connection', 'keep-alive')
+
+      const response = await fetch(ANTHROPIC_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: 2048,
+          system: system || '',
+          messages,
+          stream: true,
+        }),
+      })
+
+      if (!response.ok) {
+        const err = await response.text()
+        res.write(`data: ${JSON.stringify({ error: err })}\n\n`)
+        res.end()
+        return
+      }
+
+      // Pipe Anthropic's SSE stream directly to the client
+      response.body.on('data', (chunk) => {
+        res.write(chunk)
+      })
+      response.body.on('end', () => {
+        res.end()
+      })
+      response.body.on('error', (err) => {
+        res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`)
+        res.end()
+      })
+      return
+    }
+
+    // Non-streaming fallback
     const response = await fetch(ANTHROPIC_API_URL, {
       method: 'POST',
       headers: {
@@ -29,7 +76,7 @@ app.post('/api/chat', async (req, res) => {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 4096,
+        max_tokens: 2048,
         system: system || '',
         messages,
       }),
@@ -62,7 +109,7 @@ app.post('/api/snap', async (req, res) => {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 4096,
+        max_tokens: 2048,
         system: `You are CalcuLens AI — an exam-marker calculus tutor. Analyze the math question in the image and produce the SHORTEST correct full-marks solution.
 
 MARKING RULES (follow strictly):

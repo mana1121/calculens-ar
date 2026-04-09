@@ -43,29 +43,51 @@ export default function Chat() {
       .filter((m) => m.id !== 'welcome')
       .map((m) => ({ role: m.role, content: m.content }))
 
+    const streamingId = (Date.now() + 1).toString()
+
     try {
-      const responseText = await sendChatMessage(history)
+      // Add empty assistant message that will be updated as tokens stream in
+      setMessages((prev) => [...prev, {
+        id: streamingId,
+        role: 'assistant',
+        content: '',
+        displayContent: '',
+        streaming: true,
+      }])
+
+      const responseText = await sendChatMessage(history, (partialText) => {
+        // Update the streaming message with each new token
+        const display = stripVizBlock(partialText)
+        setMessages((prev) => prev.map((m) =>
+          m.id === streamingId
+            ? { ...m, content: partialText, displayContent: display }
+            : m
+        ))
+      })
+
+      // Finalize: parse viz data from complete response
       const vizData = parseVizBlock(responseText)
       const displayContent = stripVizBlock(responseText)
 
-      const assistantMsg = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: responseText,
-        displayContent,
-        vizData,
-      }
-      setMessages((prev) => [...prev, assistantMsg])
+      setMessages((prev) => prev.map((m) =>
+        m.id === streamingId
+          ? { ...m, content: responseText, displayContent, vizData, streaming: false }
+          : m
+      ))
     } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: `Sorry, there was an error: ${err.message}. Make sure the proxy server is running with \`npm run dev:server\`.`,
-          displayContent: `Sorry, there was an error: ${err.message}. Make sure the proxy server is running with \`npm run dev:server\`.`,
-        },
-      ])
+      setMessages((prev) => {
+        // Remove the streaming placeholder if it exists
+        const filtered = prev.filter((m) => m.id !== streamingId)
+        return [
+          ...filtered,
+          {
+            id: streamingId,
+            role: 'assistant',
+            content: `Sorry, there was an error: ${err.message}. Make sure the proxy server is running with \`npm run dev:server\`.`,
+            displayContent: `Sorry, there was an error: ${err.message}. Make sure the proxy server is running with \`npm run dev:server\`.`,
+          },
+        ]
+      })
     } finally {
       setLoading(false)
     }
